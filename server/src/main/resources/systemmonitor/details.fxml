@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.AreaChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Text?>
+
+<TitledPane animated="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="360.0" prefWidth="600.0" text="DESKTOP-ICJVLVJ" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systemmonitor.Controllers.detailsController">
+  <content>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+         <children>
+            <TabPane prefHeight="330.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE">
+              <tabs>
+                <Tab text="General">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="300.0" prefWidth="600.0">
+                           <children>
+                              <SplitPane dividerPositions="0.4, 0.7" orientation="VERTICAL" prefHeight="300.0" prefWidth="600.0">
+                                <items>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                                       <children>
+                                          <Label layoutX="16.0" layoutY="20.0" text="PC name:" />
+                                          <Label layoutX="16.0" layoutY="50.0" text="IP Address:" />
+                                          <Label layoutX="16.0" layoutY="80.0" text="MAC Address:" />
+                                          <TextField fx:id="tfPCname" editable="false" layoutX="150.0" layoutY="15.0" />
+                                          <TextField fx:id="tfIP" editable="false" layoutX="150.0" layoutY="45.0" />
+                                          <TextField fx:id="tfMAC" editable="false" layoutX="150.0" layoutY="75.0" />
+                                       </children>
+                                    </AnchorPane>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                                       <children>
+                                          <Label layoutX="16.0" layoutY="15.0" text="OS name:" />
+                                          <Label layoutX="16.0" layoutY="45.0" text="CPU Model:" />
+                                          <TextField fx:id="tfOS" editable="false" layoutX="150.0" layoutY="10.0" prefHeight="26.0" prefWidth="250.0" />
+                                          <TextField fx:id="tfCPUModel" editable="false" layoutX="150.0" layoutY="40.0" prefHeight="26.0" prefWidth="250.0" />
+                                       </children>
+                                    </AnchorPane>
+                                    <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                                       <children>
+                                          <Label layoutX="16.0" layoutY="15.0" text="Total disk:" />
+                                          <Label layoutX="16.0" layoutY="45.0" text="Total memory:" />
+                                          <TextField fx:id="tfTotalDisk" alignment="CENTER_RIGHT" editable="false" layoutX="150.0" layoutY="10.0" prefHeight="26.0" prefWidth="120.0" />
+                                          <TextField fx:id="tfTotalMem" alignment="CENTER_RIGHT" editable="false" layoutX="150.0" layoutY="40.0" prefHeight="26.0" prefWidth="120.0" />
+                                          <Text layoutX="274.0" layoutY="28.0" strokeType="OUTSIDE" strokeWidth="0.0" text="MB" />
+                                          <Text layoutX="274.0" layoutY="57.0" strokeType="OUTSIDE" strokeWidth="0.0" text="MB" />
+                                       </children>
+                                    </AnchorPane>
+                                </items>
+                              </SplitPane>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                <Tab text="Processes">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <TableView prefHeight="302.0" prefWidth="600.0">
+                                <columns>
+                                  <TableColumn prefWidth="75.0" text="C1" />
+                                  <TableColumn prefWidth="75.0" text="C2" />
+                                </columns>
+                              </TableView>
+                           </children></AnchorPane>
+                  </content>
+                </Tab>
+                  <Tab text="Performance">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="302.0" prefWidth="587.0">
+                           <children>
+                              <Accordion layoutX="58.0" prefHeight="303.0" prefWidth="544.0">
+                                <panes>
+                                  <TitledPane animated="false" prefHeight="252.0" prefWidth="550.0" text="Memory">
+                                    <content>
+                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                             <children>
+                                                <AreaChart fx:id="memoryChart" animated="false" createSymbols="false" layoutX="4.0" layoutY="-5.0" prefHeight="193.0" prefWidth="542.0" titleSide="LEFT">
+                                                  <xAxis>
+                                                    <CategoryAxis side="BOTTOM" />
+                                                  </xAxis>
+                                                  <yAxis>
+                                                    <NumberAxis side="LEFT" />
+                                                  </yAxis>
+                                                </AreaChart>
+                                                <Label layoutX="190.0" layoutY="176.0" text="Total:" />
+                                                <Text fx:id="totalmemTxt" layoutX="247.0" layoutY="189.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                                                <Label layoutX="190.0" layoutY="194.0" text="In use:" />
+                                                <Text fx:id="inusememTxt" layoutX="247.0" layoutY="207.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                                             </children>
+                                       </AnchorPane>
+                                    </content>
+                                  </TitledPane>
+                                  <TitledPane animated="false" text="CPU">
+                                       <content>
+                                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                             <children>
+                                                <AreaChart fx:id="cpuChart" createSymbols="false" layoutX="4.0" layoutY="-5.0" prefHeight="193.0" prefWidth="542.0" titleSide="LEFT">
+                                                   <xAxis>
+                                                      <CategoryAxis side="BOTTOM" />
+                                                   </xAxis>
+                                                   <yAxis>
+                                                      <NumberAxis side="LEFT" />
+                                                   </yAxis>
+                                                </AreaChart>
+                                                <Label layoutX="190.0" layoutY="176.0" text="Utilization:" />
+                                                <Text fx:id="utilizationTxt" layoutX="264.0" layoutY="190.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                                                <Label layoutX="190.0" layoutY="194.0" text="Speed:" />
+                                                <Text layoutX="264.0" layoutY="208.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                                             </children>
+                                          </AnchorPane>
+                                       </content>
+                                  </TitledPane>
+                                  <TitledPane animated="false" text="Ethernet">
+                                       <content>
+                                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                             <children>
+                                                <AreaChart fx:id="ethernetChart" layoutX="4.0" layoutY="-5.0" prefHeight="193.0" prefWidth="542.0" titleSide="LEFT">
+                                                   <xAxis>
+                                                      <CategoryAxis side="BOTTOM" />
+                                                   </xAxis>
+                                                   <yAxis>
+                                                      <NumberAxis side="LEFT" />
+                                                   </yAxis>
+                                                </AreaChart>
+                                                <Label layoutX="190.0" layoutY="176.0" text="Send:" />
+                                                <Text layoutX="264.0" layoutY="190.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                                                <Label layoutX="190.0" layoutY="194.0" text="Receive:" />
+                                                <Text layoutX="264.0" layoutY="208.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                                             </children>
+                                          </AnchorPane>
+                                       </content>
+                                  </TitledPane>
+                                </panes>
+                              </Accordion>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </Tab>
+              </tabs>
+            </TabPane>
+         </children></AnchorPane>
+  </content>
+</TitledPane>
