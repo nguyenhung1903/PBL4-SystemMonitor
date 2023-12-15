@@ -8,6 +8,7 @@ import java.util.Properties;
 import utils.Sender;
 import utils.SystemInfo;
 import utils.classes.DiskInfo;
+import utils.classes.ProcessInfo;
 
 class GetMAC {
     public static String GetMACAddress(InetAddress ip) {
@@ -34,7 +35,7 @@ public class Client {
     private int TIMEOUT;
     private int DELAY_SEND;
 
-    private ArrayList<String> processes;
+    
 
     private void LoadConfig(String fileConfig) {
         Properties config = new Properties();
@@ -51,26 +52,30 @@ public class Client {
         }
     }
 
-    private void exec(String command) {
-        processes = new ArrayList<>();
+    private ArrayList<ProcessInfo> getAllProcesses(String command) {
+        ArrayList<ProcessInfo> processes = new ArrayList<>();
         try {
             String line;
             Process p = Runtime.getRuntime().exec(command);
             p.onExit();
             BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
             while ((line = input.readLine()) != null) {
-                processes.add(line);
+                processes.add(new ProcessInfo(line));
             }
             input.close();
+            
+            return processes;
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
     }
 
-    private byte[] ArrayList2Byte(ArrayList<String> ps) throws IOException {
+    private byte[] ArrayList2Byte(ArrayList<ProcessInfo> ps) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);
-        oos.writeObject(ps);
+        ArrayList <String> result = ProcessInfo.convert2ArrayListString(ps);
+        oos.writeObject(result);
         byte[] bytes = bos.toByteArray();
         return bytes;
     }
@@ -97,7 +102,7 @@ public class Client {
                 System.out.println("Connected to server (" + clientSocket.getRemoteSocketAddress() + ").");
 
             while (clientSocket.isConnected()) {
-                exec("src\\main\\resources\\lib\\getProcessProperties.exe");
+                ArrayList<ProcessInfo> processes = getAllProcesses("src\\main\\resources\\lib\\getProcessProperties.exe");
                 // CPU and Mem Load
                 dos.writeDouble(s.getCpuLoad());
                 dos.writeLong(s.getMemUsage());
@@ -115,12 +120,15 @@ public class Client {
                 ArrayList<DiskInfo> diskInfos = s.diskInfo();
                 dos.writeInt(diskInfos.size());
                 for (DiskInfo d : diskInfos) {
-                    dos.writeUTF(d.PartitionName + "," + d.TotalSpace + "," + d.FreeSpace);
+                    dos.writeUTF(d.getPartitionName() + "," + d.getTotalSpace() + "," + d.getFreeSpace());
                 }
                 // ====================================
-                
-                
 
+                // for (ProcessInfo p : processes) {
+                //     System.out.println(p.toString());
+                // }
+
+                // Processes
                 byte[] bytes = ArrayList2Byte(processes);
                 dos.writeInt(bytes.length);
                 dos.write(bytes);
@@ -131,7 +139,7 @@ public class Client {
         } catch (IOException e) {
             try {
                 System.err.println("==============");
-                System.err.println(e.getMessage());
+                 System.err.println(e.getMessage());
                 System.err.println("Connection Time out. Reconnecting...");
                 Thread.sleep(TIMEOUT);
                 this.Run();

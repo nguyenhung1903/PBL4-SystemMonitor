@@ -2,18 +2,19 @@ package systemmonitor.Utilities;
 
 import java.util.ArrayList;
 import redis.clients.jedis.Jedis;
+import systemmonitor.Utilities.Classes.ProcessInfo;
 
 public class DataAccess {
     // private String key;
 
     Jedis jedis;
-    static int lim = 100;
+    static long lim = 100;
 
     public DataAccess() {
-        // this.key = "Client " + clientName;
-        // System.out.println("Client key: " + key);
         jedis = new Jedis("localhost", 6379);
+        jedis.flushAll();
     }
+
 
     public ArrayList<Double> getCpuUsages(String clientName) {
         String key = "Client " + clientName + ":CPU";
@@ -123,6 +124,55 @@ public class DataAccess {
     public void setTotalStorage(String clientName, Long totalStorage) {
         String key = "Client " + clientName + ":TotalStorage";
         jedis.set(key, Long.toString(totalStorage));
+    }
+
+    public ArrayList<Double> getTrafficSend(String clientName) {
+        String key = "Client " + clientName + ":TrafficSend";
+        ArrayList<Double> list = new ArrayList<Double>();
+
+        for (String s_send : jedis.lrange(key, 0, lim)) {
+            list.add(Double.parseDouble(s_send));
+        }
+
+        return list;
+    }
+
+    public Double getCurrentTrafficSend(String clientName) {
+        String key = "Client " + clientName + ":TrafficSend";
+        return Double.parseDouble(jedis.lindex(key, -1));
+    }
+
+    public void addTrafficSend(String clientName, Double send) {
+        String key = "Client " + clientName + ":TrafficSend";
+
+        if (jedis.llen(key) >= lim)
+            jedis.lpop(key);
+
+        jedis.rpush(key, send.toString());
+    }
+
+    public ArrayList<Double> getTrafficReceived(String clientName) {
+        String key = "Client " + clientName + ":TrafficReceived";
+        ArrayList<Double> list = new ArrayList<Double>();
+
+        for (String s_received : jedis.lrange(key, 0, lim)) {
+            list.add(Double.parseDouble(s_received));
+        }
+
+        return list;
+    }
+
+    public Double getCurrentTrafficReceived(String clientName) {
+        String key = "Client " + clientName + ":TrafficReceived";
+        return Double.parseDouble(jedis.lindex(key, -1));
+    }
+
+    public void addTrafficReceived(String clientName, double received) {
+        String key = "Client " + clientName + ":TrafficReceived";
+        if (jedis.llen(key) >= lim)
+            jedis.lpop(key);
+
+        jedis.rpush(key, Double.toString(received));
     }
 
     public void close() {

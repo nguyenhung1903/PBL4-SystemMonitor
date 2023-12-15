@@ -22,14 +22,22 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import systemmonitor.App;
 import systemmonitor.Utilities.DataAccess;
 
 public class overviewController {
-    private ArrayList<InetAddress> clients; // clients's InetAddress
+    // List of Client's InetAddresses
+    private ArrayList<InetAddress> clients;
+    // List of client's panes (client's pane is a titled pane)
     private ObservableList<TitledPane> clientPanes = FXCollections.observableArrayList();
+    // Details stages of clients - a stage popup when double click on a client's
+    // pane
+    private ObservableList<Stage> openingStages = FXCollections.observableArrayList();
+    // timestep to reload information of client
     private double timestep = 1;
+    // Redis connector
     private DataAccess dataAccess;
 
     @FXML
@@ -37,7 +45,7 @@ public class overviewController {
     @FXML
     private AnchorPane anchorScrollPane;
 
-    private double gap = 50;
+    private double gap = 50; // distance between two client's panes
 
     // Constructor
     public overviewController() {
@@ -52,36 +60,13 @@ public class overviewController {
         timeline.play();
     }
 
-    private void updateClientPane() {
-        if (clientPanes.isEmpty())
-            return;
-
-        for (TitledPane titledPane : clientPanes) {
-            String clientName = titledPane.getText();
-            if (titledPane.getContent() instanceof AnchorPane) {
-                AnchorPane container = (AnchorPane) titledPane.getContent();
-
-                ProgressBar ramProgressBar = (ProgressBar) container.getChildren().get(5);
-                ramProgressBar.setProgress(
-                        (double) dataAccess.getCurrentMemoryUsage(clientName) / dataAccess.getTotalMem(clientName));
-                ProgressBar cpuProgressBar = (ProgressBar) container.getChildren().get(6);
-                cpuProgressBar.setProgress(dataAccess.getCurrentCpuUsage(clientName) / 100);
-
-                Text ipText = (Text) container.getChildren().get(9);
-                Text macText = (Text) container.getChildren().get(10);
-                Text osText = (Text) container.getChildren().get(11);
-                ipText.setText(dataAccess.getIP(clientName));
-                macText.setText(dataAccess.getMAC(clientName));
-                osText.setText(dataAccess.getOSName(clientName));
-            }
-        }
-    }
-
+    // A new client connects to server
     public void addClient(InetAddress address) {
         this.clients.add(address);
         addClientPane(address.getHostName());
     }
 
+    // Dynamically add client's panes
     private void addClientPane(String clientName) {
         TitledPane newTitledPane = new TitledPane();
         newTitledPane.setText(clientName);
@@ -90,6 +75,8 @@ public class overviewController {
         contentPane.setPrefSize(220, 180);
 
         // Customize the content of the TitledPane
+
+        // The components:
         Label ipLabel = new Label("IP Address:");
         Text ipText = new Text();
         Label macLabel = new Label("MAC Address:");
@@ -104,6 +91,7 @@ public class overviewController {
         Label statusLabel = new Label("Status:");
         Text statusText = new Text("status");
 
+        // Set size and layout for components:
         ipLabel.setLayoutX(14.0);
         ipLabel.setLayoutY(14.0);
         ipText.setLayoutX(106);
@@ -146,6 +134,8 @@ public class overviewController {
 
         contentPane.getChildren().addAll(ipLabel, macLabel, osLabel, ramLabel, cpuLabel,
                 ramProgressBar, cpuProgressBar, statusLabel, separator, ipText, macText, osText, statusText);
+
+        // Add event: double click on a TitledPane
         contentPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
@@ -178,6 +168,7 @@ public class overviewController {
         anchorScrollPane.getChildren().add(newTitledPane);
     }
 
+    // Pop up details stage (details.fxml form)
     private void openDetails(String clientName) {
         FXMLLoader fxmlLoader = new FXMLLoader(
                 App.class.getResource("details" + ".fxml"));
@@ -190,21 +181,60 @@ public class overviewController {
 
             stage.setScene(new Scene(parent));
             stage.setTitle(clientName);
-
+            stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent t) {
+                    openingStages.remove(stage);
+                }
+            });
+            openingStages.add(stage);
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    // Update panes (client's information) after a step of time
+    private void updateClientPane() {
+        if (clientPanes.isEmpty())
+            return;
+
+        for (TitledPane titledPane : clientPanes) {
+            String clientName = titledPane.getText();
+            if (titledPane.getContent() instanceof AnchorPane) {
+                AnchorPane container = (AnchorPane) titledPane.getContent();
+                ProgressBar ramProgressBar = (ProgressBar) container.getChildren().get(5);
+                ProgressBar cpuProgressBar = (ProgressBar) container.getChildren().get(6);
+                try {
+                    ramProgressBar.setProgress(
+                            (double) dataAccess.getCurrentMemoryUsage(clientName) / dataAccess.getTotalMem(clientName));
+                    cpuProgressBar.setProgress(dataAccess.getCurrentCpuUsage(clientName) / 100);
+                } catch (NumberFormatException e) {
+                    ramProgressBar.setProgress(0);
+                    cpuProgressBar.setProgress(0);
+                }
+
+                Text ipText = (Text) container.getChildren().get(9);
+                Text macText = (Text) container.getChildren().get(10);
+                Text osText = (Text) container.getChildren().get(11);
+                ipText.setText(dataAccess.getIP(clientName));
+                macText.setText(dataAccess.getMAC(clientName));
+                osText.setText(dataAccess.getOSName(clientName));
+            }
+        }
+    }
+
+    // A client is disconnected from server
     public void removeClient(InetAddress address) {
         this.clients.remove(address);
         removeClientPane(address.getHostName());
+        removeClientDetailsStage(address.getHostName());
     }
 
+    // Remove the client's pane
     private void removeClientPane(String clientName) {
         for (TitledPane titledPane : clientPanes) {
-            if (titledPane.getText() == clientName) {
+            if (titledPane.getText().equals(clientName)) {
                 anchorScrollPane.getChildren().remove(titledPane);
                 clientPanes.remove(titledPane);
                 break;
@@ -213,6 +243,7 @@ public class overviewController {
         relocationPanes();
     }
 
+    // Relocation the others
     private void relocationPanes() {
 
         for (int i = 0; i < clientPanes.size(); i++) {
@@ -228,4 +259,16 @@ public class overviewController {
             clientPanes.get(i).setLayoutY(yc);
         }
     }
+
+    // Close the stage which belongs to that client (if it is opening)
+    private void removeClientDetailsStage(String clientName) {
+        for (Stage stage : openingStages) {
+            if (stage.getTitle().equals(clientName)) {
+                stage.close();
+                openingStages.remove(stage);
+                break;
+            }
+        }
+    }
+
 }
