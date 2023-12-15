@@ -9,6 +9,7 @@ import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import systemmonitor.Utilities.DataAccess;
@@ -16,6 +17,9 @@ import systemmonitor.Utilities.DataAccess;
 public class detailsController {
     private DataAccess dataAccess;
     private String clientName;
+
+    @FXML
+    private TitledPane grandPane;
 
     // GENERAL TAB
     @FXML
@@ -45,7 +49,13 @@ public class detailsController {
     @FXML
     private Text utilizationTxt;
     @FXML
+    private Text cpuspeedTxt;
+    @FXML
     private AreaChart<String, Number> ethernetChart;
+    @FXML
+    private Text sendTxt;
+    @FXML
+    private Text receivedTxt;
 
     private double memtimeIndex = 1;
     private double memTimestep = 0.5;
@@ -55,15 +65,21 @@ public class detailsController {
     private double cpuTimestep = 0.5;
     private int cpuSample = 100; // <= 100
 
+    private double trafficTimeIndex = 1;
+    private double trafficTimestep = 0.5;
+    private int trafficSample = 100; // <= 100
+
     public void setDL(String clientName, DataAccess dataAccess) {
         this.dataAccess = dataAccess;
         this.clientName = clientName;
+        this.grandPane.setText(clientName);
     }
 
     public void start() throws IOException, InterruptedException {
         initializeGeneral();
         initializeMemChart();
         initializeCpuChart();
+        initializeTrafficChart();
     }
 
     private void initializeGeneral() {
@@ -77,14 +93,19 @@ public class detailsController {
     }
 
     private void initializeMemChart() throws IOException, InterruptedException {
+
+        memtimeIndex = -memSample * memTimestep;
+
         memoryChart.setTitle("MEMORY");
         memoryChart.setLegendVisible(false);
+
+        Long totalMem = dataAccess.getTotalMem(clientName);
 
         NumberAxis yAxis = (NumberAxis) memoryChart.getYAxis();
         yAxis.setAutoRanging(false);
         yAxis.setLowerBound(0);
-        yAxis.setUpperBound(16000); // TODO: Max memory of client's ram
-        yAxis.setTickUnit(1000);
+        yAxis.setUpperBound(totalMem);
+        yAxis.setTickUnit(500);
 
         XYChart.Series<String, Number> memDataSeries = new XYChart.Series<>();
         memDataSeries.setName("Memory usage (MB)");
@@ -100,7 +121,9 @@ public class detailsController {
 
         Long mem = dataAccess.getCurrentMemoryUsage(clientName);
 
+        totalmemTxt.setText(Long.toString(totalMem));
         inusememTxt.setText(Long.toString(mem));
+
         memDataSeries.getData()
                 .add(new XYChart.Data<String, Number>(Double.toString(memtimeIndex += memTimestep), mem));
         memoryChart.getData().add(memDataSeries);
@@ -126,6 +149,9 @@ public class detailsController {
     }
 
     private void initializeCpuChart() throws IOException, InterruptedException {
+
+        cputimeIndex = -cpuSample * cpuTimestep;
+
         cpuChart.setTitle("CPU");
         cpuChart.setLegendVisible(false);
 
@@ -171,5 +197,60 @@ public class detailsController {
             cpuDataSeries.getData().remove(0);
         cpuDataSeries.getData()
                 .add(new XYChart.Data<String, Number>(Double.toString(cputimeIndex += cpuTimestep), cpu));
+    }
+
+    private void initializeTrafficChart() throws IOException, InterruptedException {
+
+        trafficTimeIndex = -trafficSample * trafficTimestep;
+
+        ethernetChart.setTitle("TRAFFIC");
+        ethernetChart.setLegendVisible(true);
+
+        NumberAxis yAxis = (NumberAxis) ethernetChart.getYAxis();
+        yAxis.setAutoRanging(true);
+
+        XYChart.Series<String, Number> sendSeries = new XYChart.Series<>();
+        sendSeries.setName("Send Traffic (Kbps)");
+
+        XYChart.Series<String, Number> receivedSeries = new XYChart.Series<>();
+        receivedSeries.setName("Received Traffic (Kbps)");
+
+        for (int i = 0; i < trafficSample - 1; i++) {
+            sendSeries.getData()
+                    .add(new XYChart.Data<String, Number>(Double.toString(trafficTimeIndex), 0));
+            receivedSeries.getData()
+                    .add(new XYChart.Data<String, Number>(Double.toString(trafficTimeIndex), 0));
+            trafficTimeIndex += trafficTimestep;
+        }
+
+        ethernetChart.getData().addAll(sendSeries, receivedSeries);
+
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(trafficTimestep),
+                event -> updateTrafficChartData(sendSeries, receivedSeries)));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+    }
+
+    private void updateTrafficChartData(XYChart.Series<String, Number> sendSeries,
+            XYChart.Series<String, Number> receivedSeries) {
+        // Update the chart data for send traffic
+        Double currentSendTraffic = dataAccess.getCurrentTrafficSend(clientName);
+        sendTxt.setText(String.format("%.2f", currentSendTraffic));
+
+        if (sendSeries.getData().size() > trafficSample) {
+            sendSeries.getData().remove(0);
+        }
+        sendSeries.getData().add(new XYChart.Data<>(Double.toString(trafficTimeIndex), currentSendTraffic));
+
+        // Update the chart data for received traffic
+        Double currentReceivedTraffic = dataAccess.getCurrentTrafficReceived(clientName);
+        receivedTxt.setText(String.format("%.2f", currentReceivedTraffic));
+
+        if (receivedSeries.getData().size() > trafficSample) {
+            receivedSeries.getData().remove(0);
+        }
+        receivedSeries.getData().add(new XYChart.Data<>(Double.toString(trafficTimeIndex), currentReceivedTraffic));
+
+        trafficTimeIndex += trafficTimestep;
     }
 }

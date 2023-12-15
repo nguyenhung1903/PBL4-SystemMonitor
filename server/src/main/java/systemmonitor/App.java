@@ -27,7 +27,7 @@ public class App extends Application {
 
         // set UI
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("overview" + ".fxml"));
-        scene = new Scene((Parent) fxmlLoader.load(), 525, 375);
+        scene = new Scene((Parent) fxmlLoader.load(), 525, 520);
         stage.setScene(scene);
         stage.setTitle("System Monitor");
         server.setController(fxmlLoader.getController());

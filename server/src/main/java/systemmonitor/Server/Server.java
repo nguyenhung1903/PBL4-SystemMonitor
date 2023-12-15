@@ -17,7 +17,7 @@ public class Server extends Thread {
     private overviewController overview;
 
     public Server() {
-        LoadServerConfig("server\\src\\main\\resources\\config\\config.cfg");
+        LoadServerConfig("src\\main\\resources\\config\\config.cfg");
     }
 
     private void LoadServerConfig(String fileConfig) {

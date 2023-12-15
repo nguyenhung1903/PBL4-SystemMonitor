@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Text?>
 
-<TitledPane animated="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="360.0" prefWidth="600.0" text="DESKTOP-ICJVLVJ" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systemmonitor.Controllers.detailsController">
+<TitledPane fx:id="grandPane" animated="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="360.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systemmonitor.Controllers.detailsController">
   <content>
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
          <children>
@@ -92,10 +92,10 @@
                                                     <NumberAxis side="LEFT" />
                                                   </yAxis>
                                                 </AreaChart>
-                                                <Label layoutX="190.0" layoutY="176.0" text="Total:" />
-                                                <Text fx:id="totalmemTxt" layoutX="247.0" layoutY="189.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
-                                                <Label layoutX="190.0" layoutY="194.0" text="In use:" />
-                                                <Text fx:id="inusememTxt" layoutX="247.0" layoutY="207.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                                                <Label layoutX="14.0" layoutY="176.0" text="Total:" />
+                                                <Text fx:id="totalmemTxt" layoutX="71.0" layoutY="189.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                                                <Label layoutX="14.0" layoutY="194.0" text="In use:" />
+                                                <Text fx:id="inusememTxt" layoutX="71.0" layoutY="207.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
                                              </children>
                                        </AnchorPane>
                                     </content>
@@ -104,7 +104,7 @@
                                        <content>
                                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                              <children>
-                                                <AreaChart fx:id="cpuChart" createSymbols="false" layoutX="4.0" layoutY="-5.0" prefHeight="193.0" prefWidth="542.0" titleSide="LEFT">
+                                                <AreaChart fx:id="cpuChart" animated="false" createSymbols="false" layoutX="4.0" layoutY="-5.0" prefHeight="193.0" prefWidth="542.0" titleSide="LEFT">
                                                    <xAxis>
                                                       <CategoryAxis side="BOTTOM" />
                                                    </xAxis>
@@ -112,10 +112,10 @@
                                                       <NumberAxis side="LEFT" />
                                                    </yAxis>
                                                 </AreaChart>
-                                                <Label layoutX="190.0" layoutY="176.0" text="Utilization:" />
-                                                <Text fx:id="utilizationTxt" layoutX="264.0" layoutY="190.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
-                                                <Label layoutX="190.0" layoutY="194.0" text="Speed:" />
-                                                <Text layoutX="264.0" layoutY="208.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                                                <Label layoutX="14.0" layoutY="176.0" text="Utilization:" />
+                                                <Text fx:id="utilizationTxt" layoutX="88.0" layoutY="190.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                                                <Label layoutX="14.0" layoutY="194.0" text="Speed:" />
+                                                <Text fx:id="cpuspeedTxt" layoutX="88.0" layoutY="208.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
                                              </children>
                                           </AnchorPane>
                                        </content>
@@ -124,7 +124,7 @@
                                        <content>
                                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                              <children>
-                                                <AreaChart fx:id="ethernetChart" layoutX="4.0" layoutY="-5.0" prefHeight="193.0" prefWidth="542.0" titleSide="LEFT">
+                                                <AreaChart fx:id="ethernetChart" animated="false" createSymbols="false" layoutX="4.0" layoutY="-5.0" prefHeight="193.0" prefWidth="542.0" titleSide="LEFT">
                                                    <xAxis>
                                                       <CategoryAxis side="BOTTOM" />
                                                    </xAxis>
@@ -132,10 +132,10 @@
                                                       <NumberAxis side="LEFT" />
                                                    </yAxis>
                                                 </AreaChart>
-                                                <Label layoutX="190.0" layoutY="176.0" text="Send:" />
-                                                <Text layoutX="264.0" layoutY="190.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
-                                                <Label layoutX="190.0" layoutY="194.0" text="Receive:" />
-                                                <Text layoutX="264.0" layoutY="208.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                                                <Label layoutX="14.0" layoutY="176.0" text="Send:" />
+                                                <Text fx:id="sendTxt" layoutX="88.0" layoutY="190.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                                                <Label layoutX="14.0" layoutY="194.0" text="Received:" />
+                                                <Text fx:id="receivedTxt" layoutX="88.0" layoutY="208.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
                                              </children>
                                           </AnchorPane>
                                        </content>
