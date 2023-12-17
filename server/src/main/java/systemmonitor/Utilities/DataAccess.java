@@ -1,6 +1,7 @@
 package systemmonitor.Utilities;
 
 import java.util.ArrayList;
+
 import redis.clients.jedis.Jedis;
 import systemmonitor.Utilities.Classes.ProcessInfo;
 
@@ -13,6 +14,25 @@ public class DataAccess {
     public DataAccess() {
         jedis = new Jedis("localhost", 6379);
         jedis.flushAll();
+    }
+
+
+    public void setProcessList(String clientName, ArrayList<ProcessInfo> processes) {
+        String key = "Client " + clientName + ":ProcessList";
+        jedis.del(key);
+        for (ProcessInfo process : processes) {
+            jedis.rpush(key, process.toString());
+        }
+    }
+
+    public ArrayList<ProcessInfo> getProcessList(String clientName) {
+        String key = "Client " + clientName + ":ProcessList";
+        ArrayList<ProcessInfo> list = new ArrayList<ProcessInfo>();
+        for (String s_process : jedis.lrange(key, 0, -1)) {
+            list.add(new ProcessInfo(s_process));
+        }
+
+        return list;
     }
 
 

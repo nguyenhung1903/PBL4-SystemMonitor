@@ -160,9 +160,9 @@ public class ClientHandler extends Thread {
 
             ArrayList<ProcessInfo> processes = ProcessInfo.convert2ArrayListProcessInfo(Bytes2ArrayList(data));
 
-            for (ProcessInfo p: processes){
-                System.out.println(p.toString());
-            }
+//            for (ProcessInfo p: processes){
+//                System.out.println(p.toString());
+//            }
 
             System.out.println("=========");
             System.out.println("OS: " + OSName + "\nCPU Model: " + CPUModel);
@@ -188,6 +188,8 @@ public class ClientHandler extends Thread {
             dataAccess.setTotalStorage(clientName, TotalStorage);
             dataAccess.addTrafficReceived(clientName, traffic_received);
             dataAccess.addTrafficSend(clientName, traffic_send);
+
+            dataAccess.setProcessList(clientName, processes);
 
             System.out.println("=========");
         }

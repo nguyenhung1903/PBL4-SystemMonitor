@@ -1,6 +1,7 @@
 package systemmonitor.Controllers;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -8,10 +9,14 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import systemmonitor.Utilities.Classes.ProcessInfo;
 import systemmonitor.Utilities.DataAccess;
 
 public class detailsController {
@@ -36,6 +41,10 @@ public class detailsController {
     private TextField tfTotalDisk;
     @FXML
     private TextField tfTotalMem;
+
+    // PROCESS TAB
+    @FXML
+    private TableView processTable;
 
     // PERFORMANCE TAB
     @FXML
@@ -80,6 +89,7 @@ public class detailsController {
         initializeMemChart();
         initializeCpuChart();
         initializeTrafficChart();
+        initializeProcessTable();
     }
 
     private void initializeGeneral() {
@@ -90,6 +100,49 @@ public class detailsController {
         tfCPUModel.setText(dataAccess.getCPUModel(clientName));
         tfTotalDisk.setText(Long.toString(dataAccess.getTotalStorage(clientName)));
         tfTotalMem.setText(Long.toString(dataAccess.getTotalMem(clientName)));
+    }
+
+    private void initializeProcessTable() throws IOException, InterruptedException {
+        processTable.getItems().clear();
+        processTable.getColumns().clear();
+
+        // Create column PID (Data type of String).
+        TableColumn<ProcessInfo, String> pidCol //
+                = new TableColumn<ProcessInfo, String>("PID");
+
+        // Create column Process Name (Data type of String).
+        TableColumn<ProcessInfo, String> processNameCol//
+                = new TableColumn<ProcessInfo, String>("Process Name");
+
+        // Create column Process Path (Data type of String).
+        TableColumn<ProcessInfo, String> processPathCol//
+                = new TableColumn<ProcessInfo, String>("Process Path");
+
+        // Defines how to fill data for each cell.
+        pidCol.setCellValueFactory(new PropertyValueFactory<>("PID"));
+        processNameCol.setCellValueFactory(new PropertyValueFactory<>("ProcessName"));
+        processPathCol.setCellValueFactory(new PropertyValueFactory<>("ProcessPath"));
+
+        processTable.getColumns().addAll(pidCol, processNameCol, processPathCol);
+
+        ArrayList<ProcessInfo> processes = dataAccess.getProcessList(clientName);
+        for (ProcessInfo process : processes) {
+            processTable.getItems().add(process);
+        }
+
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1),
+                event -> updateProcessTable()));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+    }
+
+    private void updateProcessTable() {
+        processTable.getItems().clear();
+        ArrayList<ProcessInfo> processes = dataAccess.getProcessList(clientName);
+        for (ProcessInfo process : processes) {
+            System.out.println(process.toString());
+            processTable.getItems().add(process);
+        }
     }
 
     private void initializeMemChart() throws IOException, InterruptedException {

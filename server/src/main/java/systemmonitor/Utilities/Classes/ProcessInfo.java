@@ -23,13 +23,14 @@ public class ProcessInfo implements Serializable {
 
     @Override
     public String toString() {
-        return "ProcessInfo{" +
-                "PID='" + PID + '\'' +
-                ", ProcessName='" + ProcessName + '\'' +
-                ", ProcessPath='" + ProcessPath + '\'' +
-                '}';
+//        return "ProcessInfo{" +
+//                "PID='" + PID + '\'' +
+//                ", ProcessName='" + ProcessName + '\'' +
+//                ", ProcessPath='" + ProcessPath + '\'' +
+//                '}';
+//    }
+        return PID + "," + ProcessName + "," + ProcessPath;
     }
-
     public static ArrayList<String> convert2ArrayListString(ArrayList<ProcessInfo> processes){
         ArrayList<String> result = new ArrayList<>();
         for (ProcessInfo process : processes) {
