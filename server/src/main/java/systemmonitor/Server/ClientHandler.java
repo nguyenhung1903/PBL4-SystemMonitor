@@ -22,6 +22,7 @@ import systemmonitor.Utilities.Classes.DiskInfo;
 import systemmonitor.Utilities.Classes.ProcessInfo;
 
 import java.io.File;
+import java.util.Date;
 
 public class ClientHandler extends Thread {
     private final Socket clientSocket;
@@ -164,21 +165,21 @@ public class ClientHandler extends Thread {
 //                System.out.println(p.toString());
 //            }
 
-            System.out.println("=========");
-            System.out.println("OS: " + OSName + "\nCPU Model: " + CPUModel);
-            System.out.println("CPU Load: " + CPULoad);
-            System.out.println("Mem: " + MemUsage + "/" + TotalMem + "MB");
-            System.out.printf("Traffic send: %.5f\n", traffic_send);
-            System.out.printf("Traffic received: %.5f\n", traffic_received);
-            System.out.println("Disks: ");
+//            System.out.println("=========");
+//            System.out.println("OS: " + OSName + "\nCPU Model: " + CPUModel);
+//            System.out.println("CPU Load: " + CPULoad);
+//            System.out.println("Mem: " + MemUsage + "/" + TotalMem + "MB");
+//            System.out.printf("Traffic send: %.5f\n", traffic_send);
+//            System.out.printf("Traffic received: %.5f\n", traffic_received);
+//            System.out.println("Disks: ");
 
             long TotalStorage = 0;
             for (DiskInfo d : diskInfos) {
                 TotalStorage += d.getTotalSpace();
-                System.out.println(d.getPartitionName() + " # Disk Space: " + d.getUsageSpace() + "/" + d.getTotalSpace() + "MB");
+//                System.out.println(d.getPartitionName() + " # Disk Space: " + d.getUsageSpace() + "/" + d.getTotalSpace() + "MB");
             }
 
-            System.out.println("MAC: " + MAC + ": " + processes.size());
+//            System.out.println("MAC: " + MAC + ": " + processes.size());
 
             String clientName = clientSocket.getInetAddress().getHostName();
 
@@ -219,23 +220,23 @@ public class ClientHandler extends Thread {
 
             ArrayList<String> processes = Bytes2ArrayList(data);
 
-            System.out.println("=========");
-            System.out.println("OS: " + OSName + "\nCPU Model: " + CPUModel);
-            System.out.println("CPU Load: " + CPULoad);
-            System.out.println("Mem: " + MemUsage + "/" + TotalMem + "MB");
-            System.out.println("Disks: ");
-            for (DiskInfo d : diskInfos) {
-                System.out.println(d.getPartitionName() + " # Disk Space: " + d.getUsageSpace() + "/" + d.getTotalSpace() + "MB");
-            }
+//            System.out.println("=========");
+//            System.out.println("OS: " + OSName + "\nCPU Model: " + CPUModel);
+//            System.out.println("CPU Load: " + CPULoad);
+//            System.out.println("Mem: " + MemUsage + "/" + TotalMem + "MB");
+//            System.out.println("Disks: ");
+//            for (DiskInfo d : diskInfos) {
+//                System.out.println(d.getPartitionName() + " # Disk Space: " + d.getUsageSpace() + "/" + d.getTotalSpace() + "MB");
+//            }
 
-            System.out.println("MAC: " + MAC + ": " + processes.size());
+//            System.out.println("MAC: " + MAC + ": " + processes.size());
 
             String clientName = clientSocket.getInetAddress().getHostName();
 
             dataAccess.addCpuUsage(clientName, CPULoad);
             dataAccess.addMemUsage(clientName, MemUsage);
 
-            System.out.println("=========");
+//            System.out.println("=========");
         }
 
     }
