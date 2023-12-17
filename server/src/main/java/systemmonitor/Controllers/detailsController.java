@@ -58,15 +58,15 @@ public class detailsController {
     private Text receivedTxt;
 
     private double memtimeIndex = 1;
-    private double memTimestep = 2;
+    private double memTimestep = 0.5;
     private int memSample = 100; // <= 100
 
     private double cputimeIndex = 1;
-    private double cpuTimestep = 2;
+    private double cpuTimestep = 0.5;
     private int cpuSample = 100; // <= 100
 
     private double trafficTimeIndex = 1;
-    private double trafficTimestep = 2;
+    private double trafficTimestep = 0.5;
     private int trafficSample = 100; // <= 100
 
     public void setDL(String clientName, DataAccess dataAccess) {
