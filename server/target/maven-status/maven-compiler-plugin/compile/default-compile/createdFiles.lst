@@ -1,0 +1,11 @@
+systemmonitor\Server\ClientHandler.class
+systemmonitor\Server\Server.class
+systemmonitor\App.class
+systemmonitor\Controllers\detailsController.class
+module-info.class
+systemmonitor\Utilities\DataAccess.class
+systemmonitor\Controllers\overviewController.class
+systemmonitor\Controllers\overviewController$1.class
+systemmonitor\Controllers\overviewController$2.class
+systemmonitor\Utilities\Classes\DiskInfo.class
+systemmonitor\App$1.class
