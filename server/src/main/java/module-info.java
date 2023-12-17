@@ -5,6 +5,7 @@ module systemmonitor {
 
     opens systemmonitor to javafx.fxml;
     opens systemmonitor.Controllers to javafx.fxml;
+    opens systemmonitor.Utilities.Classes to javafx.fxml, javafx.base;
 
     exports systemmonitor;
 }
