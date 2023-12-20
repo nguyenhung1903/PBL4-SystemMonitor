@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import redis.clients.jedis.Jedis;
 import systemmonitor.Utilities.Classes.ProcessInfo;
 
+class Status{
+    public static boolean Warning = true;
+    public static boolean Normal = false;
+}
+
 public class DataAccess {
     // private String key;
 
@@ -16,6 +21,21 @@ public class DataAccess {
         jedis.flushAll();
     }
 
+    public void setStatus(String clientName, boolean status){
+        String key = "Client " + clientName + ":Status";
+        jedis.del(key);
+        jedis.set(key, Boolean.toString(status));
+    }
+
+    public String getStatus(String clientName){
+        String key = "Client " + clientName + ":Status";
+
+        if (Boolean.parseBoolean(jedis.get(key)) == Status.Warning) {
+            return "Warning";
+        } else {
+            return "Normal";
+        }
+    }
 
     public void setProcessList(String clientName, ArrayList<ProcessInfo> processes) {
         String key = "Client " + clientName + ":ProcessList";

@@ -35,7 +35,7 @@ public class Client {
     private int TIMEOUT;
     private int DELAY_SEND;
 
-    
+    private boolean isWarning = false;
 
     private void LoadConfig(String fileConfig) {
         Properties config = new Properties();
@@ -133,6 +133,9 @@ public class Client {
                 dos.writeInt(bytes.length);
                 dos.write(bytes);
                 dos.flush();
+
+                
+                dos.writeBoolean(isWarning);
 
                 Thread.sleep(DELAY_SEND);
             }

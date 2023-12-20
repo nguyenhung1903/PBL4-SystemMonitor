@@ -164,6 +164,8 @@ public class ClientHandler extends Thread {
 //                System.out.println(p.toString());
 //            }
 
+            boolean isWarning = dis.readBoolean();
+
             System.out.println("=========");
             System.out.println("OS: " + OSName + "\nCPU Model: " + CPUModel);
             System.out.println("CPU Load: " + CPULoad);
@@ -178,7 +180,7 @@ public class ClientHandler extends Thread {
                 System.out.println(d.getPartitionName() + " # Disk Space: " + d.getUsageSpace() + "/" + d.getTotalSpace() + "MB");
             }
 
-            System.out.println("MAC: " + MAC + ": " + processes.size());
+            System.out.println("MAC: " + MAC + ": " + processes.size() + ": " + isWarning);
 
             String clientName = clientSocket.getInetAddress().getHostName();
 
@@ -188,8 +190,8 @@ public class ClientHandler extends Thread {
             dataAccess.setTotalStorage(clientName, TotalStorage);
             dataAccess.addTrafficReceived(clientName, traffic_received);
             dataAccess.addTrafficSend(clientName, traffic_send);
-
             dataAccess.setProcessList(clientName, processes);
+            dataAccess.setStatus(clientName, isWarning);
 
             System.out.println("=========");
         }
