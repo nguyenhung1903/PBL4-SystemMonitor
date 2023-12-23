@@ -87,6 +87,9 @@ public class overviewController {
         Label statusLabel = new Label("Status:");
         Text statusText = new Text("status");
 
+
+        statusText.setStyle("-fx-fill: #00ff00; -fx-font-weight: bold;");
+
         // Set size and layout for components:
         ipLabel.setLayoutX(14.0);
         ipLabel.setLayoutY(14.0);
