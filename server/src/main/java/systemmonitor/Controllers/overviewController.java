@@ -131,8 +131,25 @@ public class overviewController {
         contentPane.getChildren().addAll(ipLabel, macLabel, osLabel, ramLabel, cpuLabel,
                 ramProgressBar, cpuProgressBar, statusLabel, separator, ipText, macText, osText, statusText);
 
-        // Add event: double click on a TitledPane
-        contentPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        // Context menu for new title pane
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem openItem = new MenuItem("Open");
+        MenuItem disconnectItem = new MenuItem("Disconnect");
+        // Add event: click on open item
+        openItem.setOnAction((event) -> {
+            openDetails(clientName);
+        });
+        // Add event: click on disconnect item
+        disconnectItem.setOnAction((event) -> {
+            // TODO: disconnect client
+            removeClientPane(clientName);
+            removeClientDetailsStage(clientName);
+        });
+
+        contextMenu.getItems().addAll(openItem,disconnectItem);
+
+        // Add event: double-click on a TitledPane
+        newTitledPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
@@ -143,6 +160,7 @@ public class overviewController {
             }
         });
 
+        newTitledPane.setContextMenu(contextMenu);
         newTitledPane.setContent(contentPane);
 
         // Set the position for the new TitledPane
