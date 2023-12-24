@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import systemmonitor.Controllers.OverviewController;
 import systemmonitor.Server.Server;
 import java.io.IOException;
 
@@ -30,7 +31,8 @@ public class App extends Application {
         scene = new Scene((Parent) fxmlLoader.load(), 525, 520);
         stage.setScene(scene);
         stage.setTitle("System Monitor");
-        server.setController(fxmlLoader.getController());
+        OverviewController overviewController = fxmlLoader.getController();
+        server.setController(overviewController);
         server.start();
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override

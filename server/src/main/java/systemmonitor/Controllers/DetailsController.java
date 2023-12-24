@@ -19,7 +19,7 @@ import javafx.util.Duration;
 import systemmonitor.Utilities.Classes.ProcessInfo;
 import systemmonitor.Utilities.DataAccess;
 
-public class detailsController {
+public class DetailsController {
     private DataAccess dataAccess;
     private String clientName;
 
@@ -67,15 +67,15 @@ public class detailsController {
     private Text receivedTxt;
 
     private double memtimeIndex = 1;
-    private double memTimestep = 0.5;
+    private double memTimestep = 1;
     private int memSample = 100; // <= 100
 
     private double cputimeIndex = 1;
-    private double cpuTimestep = 0.5;
+    private double cpuTimestep = 1;
     private int cpuSample = 100; // <= 100
 
     private double trafficTimeIndex = 1;
-    private double trafficTimestep = 0.5;
+    private double trafficTimestep = 1;
     private int trafficSample = 100; // <= 100
 
     public void setDL(String clientName, DataAccess dataAccess) {

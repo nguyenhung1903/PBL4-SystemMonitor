@@ -2,10 +2,12 @@ package systemmonitor.Server;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Properties;
 
 import javafx.application.Platform;
-import systemmonitor.Controllers.overviewController;
+import systemmonitor.Controllers.OverviewController;
 
 // import utils.ClientHandler;
 
@@ -14,7 +16,10 @@ public class Server extends Thread {
     private int PORT;
     private int BACK_LOG;
 
-    private overviewController overview;
+    private ArrayList<ClientHandler> clients = new ArrayList<ClientHandler>();
+    private HashSet<String> blacklist = new HashSet<String>();
+
+    private OverviewController overview;
 
     public Server() {
         LoadServerConfig("src\\main\\resources\\config\\config.cfg");
@@ -34,8 +39,42 @@ public class Server extends Thread {
         }
     }
 
-    public void setController(overviewController overview) {
+    public void setController(OverviewController overview) {
         this.overview = overview;
+        overview.setServer(this);
+    }
+
+    public void addClient(ClientHandler client) {
+        clients.add(client);
+        Platform.runLater(() -> {
+            // Ensure that overview is not null before calling the method
+            if (overview != null) {
+                overview.addClient(client.getInetAddress());
+            }
+        });
+    }
+
+    public void disconnectClient(InetAddress inet) {
+        for (ClientHandler client : clients) {
+            if (client.getInetAddress().equals(inet)) {
+                client.disconnect();
+                break;
+            }
+        }
+    }
+
+    public void removeClient(ClientHandler client) {
+        clients.remove(client);
+        Platform.runLater(() -> {
+            // Ensure that overview is not null before calling the method
+            if (overview != null) {
+                overview.removeClient(client.getInetAddress());
+            }
+        });
+    }
+
+    public ArrayList<ClientHandler> getClient() {
+        return clients;
     }
 
     @Override
@@ -57,19 +96,13 @@ public class Server extends Thread {
             while (!serverSocket.isClosed()) {
                 try {
                     Socket clientSocket = serverSocket.accept();
-                    // System.out.println("Client connected: " +
-                    // clientSocket.getInetAddress().getHostName());
+
                     System.out.println("Client connected: ");
 
-                    Platform.runLater(() -> {
-                        // Ensure that overview is not null before calling the method
-                        if (overview != null) {
-                            overview.addClient(clientSocket.getInetAddress());
-                        }
-                    });
                     // Create a thread to handle the client's request
-                    ClientHandler clientHandler = new ClientHandler(clientSocket);
-                    clientHandler.setController(overview);
+                    ClientHandler clientHandler = new ClientHandler(clientSocket, this);
+                    addClient(clientHandler);
+//                    clientHandler.setController(overview);
                     clientHandler.start();
                 } catch (Exception e) {
                     e.printStackTrace();
