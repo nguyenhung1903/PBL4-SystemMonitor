@@ -108,6 +108,13 @@ public class Client {
 
             while (clientSocket.isConnected()) {
                 ArrayList<ProcessInfo> processes = getAllProcesses("src\\main\\resources\\lib\\getProcessProperties.exe");
+                processes.sort((o1, o2) -> {
+                    if (o1.getProcessName().compareTo(o2.getProcessName()) == 0) {
+                        return o1.getPID().compareTo(o2.getPID());
+                    } else {
+                        return o1.getProcessName().compareTo(o2.getProcessName());
+                    }
+                });
                 // CPU and Mem Load
                 dos.writeDouble(s.getCpuLoad());
                 dos.writeLong(s.getMemUsage());
