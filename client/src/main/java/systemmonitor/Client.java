@@ -91,13 +91,14 @@ public class Client {
             DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
             DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
 
-            MessageReader messageReader = new MessageReader(clientSocket, this);
-            messageReader.start();
             // MAC
             String IP = dis.readUTF();
             String MAC = GetMAC.GetMACAddress(InetAddress.getByName(IP));
             dos.writeUTF(MAC);
             //
+
+            MessageReader messageReader = new MessageReader(clientSocket, this);
+            messageReader.start();
 
             // OS Name
             dos.writeUTF(s.osName());
