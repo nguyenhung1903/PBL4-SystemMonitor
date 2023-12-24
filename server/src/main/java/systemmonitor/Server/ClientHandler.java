@@ -91,7 +91,7 @@ public class ClientHandler extends Thread {
             String GPUModel = dis.readUTF();
             return GPUModel;
         } catch (Exception e) {
-            System.out.println("The system can't get the CPU Model!");
+            System.err.println("The system can't get the CPU Model!");
             return "";
         }
     }
@@ -105,7 +105,7 @@ public class ClientHandler extends Thread {
             String MAC = dis.readUTF();
             return MAC;
         } catch (Exception e) {
-            System.out.println("The system can't get the MAC address!");
+            System.err.println("The system can't get the MAC address!");
             return "";
         }
     }
