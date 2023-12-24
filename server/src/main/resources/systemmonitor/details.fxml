@@ -92,10 +92,10 @@
                                                     <NumberAxis side="LEFT" />
                                                   </yAxis>
                                                 </AreaChart>
-                                                <Label layoutX="14.0" layoutY="176.0" text="Total:" />
-                                                <Text fx:id="totalmemTxt" layoutX="71.0" layoutY="189.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
-                                                <Label layoutX="14.0" layoutY="194.0" text="In use:" />
-                                                <Text fx:id="inusememTxt" layoutX="71.0" layoutY="207.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                                                <Label layoutX="14.0" layoutY="176.0" text="Total (MB):" />
+                                                <Text fx:id="totalmemTxt" layoutX="78.0" layoutY="189.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                                                <Label layoutX="14.0" layoutY="194.0" text="In use (MB):" />
+                                                <Text fx:id="inusememTxt" layoutX="78.0" layoutY="207.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
                                              </children>
                                        </AnchorPane>
                                     </content>
@@ -112,10 +112,10 @@
                                                       <NumberAxis side="LEFT" />
                                                    </yAxis>
                                                 </AreaChart>
-                                                <Label layoutX="14.0" layoutY="176.0" text="Utilization:" />
-                                                <Text fx:id="utilizationTxt" layoutX="88.0" layoutY="190.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
-                                                <Label layoutX="14.0" layoutY="194.0" text="Speed:" />
-                                                <Text fx:id="cpuspeedTxt" layoutX="88.0" layoutY="208.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                                                <Label layoutX="14.0" layoutY="178.0" text="Utilization (%):" />
+                                                <Text fx:id="utilizationTxt" layoutX="94.0" layoutY="192.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                                                <Label layoutX="14.0" layoutY="196.0" text="Speed:" />
+                                                <Text fx:id="cpuspeedTxt" layoutX="94.0" layoutY="210.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" />
                                              </children>
                                           </AnchorPane>
                                        </content>

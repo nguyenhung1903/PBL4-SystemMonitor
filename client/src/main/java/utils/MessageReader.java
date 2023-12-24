@@ -3,6 +3,7 @@ package utils;
 import systemmonitor.Client;
 
 import java.io.DataInputStream;
+import java.io.IOException;
 import java.net.Socket;
 
 public class MessageReader extends Thread {
@@ -27,8 +28,8 @@ public class MessageReader extends Thread {
                     break;
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("Cannot read message from server!");
         }
     }
 }

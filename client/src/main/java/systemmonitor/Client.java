@@ -85,7 +85,6 @@ public class Client {
 
     private void Run() throws IOException {
 
-
         SystemInfo s = new SystemInfo();
         try {
             clientSocket = new Socket(this.HOSTNAME, this.PORT);
