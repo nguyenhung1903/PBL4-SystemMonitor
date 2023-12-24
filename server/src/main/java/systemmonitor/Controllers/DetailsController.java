@@ -19,7 +19,7 @@ import javafx.util.Duration;
 import systemmonitor.Utilities.Classes.ProcessInfo;
 import systemmonitor.Utilities.DataAccess;
 
-public class detailsController {
+public class DetailsController {
     private DataAccess dataAccess;
     private String clientName;
 

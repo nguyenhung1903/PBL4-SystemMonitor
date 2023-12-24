@@ -11,12 +11,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 
-import javafx.application.Platform;
-import systemmonitor.Controllers.overviewController;
 import systemmonitor.Utilities.DataAccess;
 import systemmonitor.Utilities.Classes.DiskInfo;
 import systemmonitor.Utilities.Classes.ProcessInfo;
@@ -25,21 +24,28 @@ import java.io.File;
 
 public class ClientHandler extends Thread {
     private final Socket clientSocket;
+    private final Server server;
     private String MAC = null;
     private String OSName = null;
     private String CPUModel = null;
 
-    private overviewController overview;
+//    private OverviewController overview;
 
     DataAccess dataAccess;
 
-    public ClientHandler(Socket socket) {
+    public ClientHandler(Socket socket, Server server) {
         this.clientSocket = socket;
+        this.server = server;
         this.dataAccess = new DataAccess();
     }
 
-    public void setController(overviewController overview) {
-        this.overview = overview;
+//    public void setController(OverviewController overview) {
+//        this.overview = overview;
+//        overview.setClientHandler(this);
+//    }
+
+    public InetAddress getInetAddress() {
+        return clientSocket.getInetAddress();
     }
 
     @Override
@@ -50,14 +56,12 @@ public class ClientHandler extends Thread {
             // receiveObject();
             // receiveFile();
         } catch (SocketException e) {
-            Platform.runLater(() -> {
-                // Ensure that overview is not null before calling the method
-                if (overview != null) {
-                    overview.removeClient(clientSocket.getInetAddress());
-                }
-            });
-
-        } catch (Exception e) {
+            System.err.println("Client disconnected!");
+            if (!clientSocket.isClosed()) {
+                disconnect();
+            }
+        } catch (IOException e) {
+            System.err.println("Cannot receive data from client!");
             e.printStackTrace();
         } finally {
             if (clientSocket != null) {
@@ -118,8 +122,18 @@ public class ClientHandler extends Thread {
         }
     }
 
-    private void receiveStaticInfo() throws Exception {
+    private void receiveStaticInfo() {
         this.MAC = GetMACAddress();
+
+        if (server.getBlackList().contains(MAC)) {
+            System.out.println("Client " + clientSocket.getInetAddress().getHostName() + " is in blacklist!");
+            sendDisconnectMessage("banned");
+            disconnect();
+            return;
+        } else {
+            server.addClient(this);
+        }
+
         this.OSName = GetOSName();
         this.CPUModel = GetCPUModel();
 
@@ -132,7 +146,7 @@ public class ClientHandler extends Thread {
         dataAccess.setCPUModel(clientName, CPUModel);
     }
 
-    private void receiveDynamicInfo() throws Exception {
+    private void receiveDynamicInfo() throws IOException {
         while (this.clientSocket.isConnected()) {
             DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
 
@@ -275,6 +289,16 @@ public class ClientHandler extends Thread {
         }
     }
 
+    public void sendDisconnectMessage(String message) {
+        try {
+            DataOutputStream dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
+            dataOutputStream.writeUTF(message);
+        } catch (IOException e) {
+            System.err.println("Cannot send disconnect message to client!");
+            e.printStackTrace();
+        }
+    }
+
     private void writeTextfile(String filePath, DataInputStream dataInputStream) {
         try {
             InputStreamReader in = new InputStreamReader(dataInputStream);
@@ -321,6 +345,16 @@ public class ClientHandler extends Thread {
         }
 
         catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void disconnect() {
+        try {
+            this.interrupt();
+            clientSocket.close();
+            server.removeClient(this);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

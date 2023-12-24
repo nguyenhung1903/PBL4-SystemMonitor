@@ -31,15 +31,10 @@ public class DataAccess {
         }
     }
 
-    public String getStatus(String clientName){
+    public Boolean getStatus(String clientName){
         try (Jedis jedis = pool.getResource()) {
             String key = "Client " + clientName + ":Status";
-
-            if (Boolean.parseBoolean(jedis.get(key)) == Status.Warning) {
-                return "Warning";
-            } else {
-                return "Normal";
-            }
+            return Boolean.parseBoolean(jedis.get(key));
         } catch (Exception e) {
             e.printStackTrace();
             return null;
