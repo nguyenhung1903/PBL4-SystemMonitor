@@ -153,9 +153,8 @@ public class OverviewController {
         });
         // Add event: click on ban item
         banItem.setOnAction((event) -> {
-            // TODO: ban client
-//            removeClientPane(clientName);
-//            removeClientDetailsStage(clientName);
+            server.addToBlackList(dataAccess.getMAC(inet.getHostName()));
+            server.disconnectClient(inet);
         });
         contextMenu.getItems().addAll(openItem, disconnectItem, banItem);
 

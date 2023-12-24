@@ -60,14 +60,6 @@ public class ClientHandler extends Thread {
             if (!clientSocket.isClosed()) {
                 disconnect();
             }
-//            disconnect();
-//            Platform.runLater(() -> {
-//                // Ensure that overview is not null before calling the method
-//                if (overview != null) {
-//                    overview.removeClient(clientSocket.getInetAddress());
-//                }
-//            });
-
         } catch (IOException e) {
             System.err.println("Cannot receive data from client!");
             e.printStackTrace();
@@ -132,6 +124,15 @@ public class ClientHandler extends Thread {
 
     private void receiveStaticInfo() {
         this.MAC = GetMACAddress();
+
+        if (server.getBlackList().contains(MAC)) {
+            System.out.println("Client " + clientSocket.getInetAddress().getHostName() + " is in blacklist!");
+            disconnect();
+            return;
+        } else {
+            server.addClient(this);
+        }
+
         this.OSName = GetOSName();
         this.CPUModel = GetCPUModel();
 

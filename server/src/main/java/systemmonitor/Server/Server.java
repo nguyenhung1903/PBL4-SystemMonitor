@@ -16,13 +16,14 @@ public class Server extends Thread {
     private int PORT;
     private int BACK_LOG;
 
-    private ArrayList<ClientHandler> clients = new ArrayList<ClientHandler>();
+    private HashSet<ClientHandler> clients = new HashSet<ClientHandler>();
     private HashSet<String> blacklist = new HashSet<String>();
 
     private OverviewController overview;
 
     public Server() {
         LoadServerConfig("src\\main\\resources\\config\\config.cfg");
+        LoadBannedList("src\\main\\resources\\config\\blacklist.txt");
     }
 
     private void LoadServerConfig(String fileConfig) {
@@ -33,7 +34,18 @@ public class Server extends Thread {
             this.HOSTNAME = config.getProperty("HOSTNAME");
             this.PORT = Integer.parseInt(config.getProperty("PORT"));
             this.BACK_LOG = Integer.parseInt(config.getProperty("BACK_LOG"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    private void LoadBannedList(String fileBlacklist) {
+        try (BufferedReader br = new BufferedReader(new FileReader(fileBlacklist))) {
+            String line;
+            // Read each line from the file
+            while ((line = br.readLine()) != null) {
+                blacklist.add(line);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -73,8 +85,23 @@ public class Server extends Thread {
         });
     }
 
-    public ArrayList<ClientHandler> getClient() {
+    public HashSet<ClientHandler> getClient() {
         return clients;
+    }
+
+    public void addToBlackList(String macAddress) {
+        blacklist.add(macAddress);
+        try {
+            FileWriter fw = new FileWriter("src\\main\\resources\\config\\blacklist.txt", true);
+            fw.write(macAddress + "\n");
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public HashSet<String> getBlackList() {
+        return blacklist;
     }
 
     @Override
@@ -101,7 +128,6 @@ public class Server extends Thread {
 
                     // Create a thread to handle the client's request
                     ClientHandler clientHandler = new ClientHandler(clientSocket, this);
-                    addClient(clientHandler);
 //                    clientHandler.setController(overview);
                     clientHandler.start();
                 } catch (Exception e) {

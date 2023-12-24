@@ -139,7 +139,19 @@ public class Client {
 
                 Thread.sleep(DELAY_SEND);
             }
-        } catch (IOException e) {
+        }
+
+        catch (SocketException e) {
+            System.err.println("Connection reset. Reconnecting...");
+            try {
+                Thread.sleep(TIMEOUT);
+                this.Run();
+            } catch (InterruptedException e1) {
+                e.printStackTrace();
+            }
+        }
+
+        catch (IOException e) {
             try {
                 System.err.println("==============");
                  System.err.println(e.getMessage());
@@ -149,7 +161,9 @@ public class Client {
             } catch (InterruptedException e1) {
                 e1.printStackTrace();
             }
-        } catch (InterruptedException e) {
+        }
+
+        catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
             if (clientSocket != null) {
