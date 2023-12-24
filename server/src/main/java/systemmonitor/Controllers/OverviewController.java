@@ -21,11 +21,14 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import systemmonitor.App;
+import systemmonitor.Server.ClientHandler;
+import systemmonitor.Server.Server;
 import systemmonitor.Utilities.DataAccess;
 
-public class overviewController {
+public class OverviewController {
+    private Server server;
     // List of Client's InetAddresses
-    private ArrayList<InetAddress> clients;
+//    private ArrayList<InetAddress> clients;
     // List of client's panes (client's pane is a titled pane)
     private ObservableList<TitledPane> clientPanes = FXCollections.observableArrayList();
     // Details stages of clients - a stage popup when double click on a client's
@@ -44,8 +47,8 @@ public class overviewController {
     private double gap = 50; // distance between two client's panes
 
     // Constructor
-    public overviewController() {
-        this.clients = new ArrayList<>();
+    public OverviewController() {
+//        this.clients = new ArrayList<>();
         dataAccess = new DataAccess();
     }
 
@@ -56,16 +59,20 @@ public class overviewController {
         timeline.play();
     }
 
-    // A new client connects to server
-    public void addClient(InetAddress address) {
-        this.clients.add(address);
-        addClientPane(address.getHostName());
+    public void setServer(Server server) {
+        this.server = server;
     }
 
+    // A new client connects to server
+//    public void addClient(InetAddress address) {
+////        this.clients.add(address);
+//        addClientPane(address.getHostName());
+//    }
+
     // Dynamically add client's panes
-    private void addClientPane(String clientName) {
+    public void addClient(InetAddress inet) {
         TitledPane newTitledPane = new TitledPane();
-        newTitledPane.setText(clientName);
+        newTitledPane.setText(inet.getHostName());
 
         AnchorPane contentPane = new AnchorPane();
         contentPane.setPrefSize(220, 180);
@@ -138,18 +145,21 @@ public class overviewController {
         ContextMenu contextMenu = new ContextMenu();
         MenuItem openItem = new MenuItem("Open");
         MenuItem disconnectItem = new MenuItem("Disconnect");
+        MenuItem banItem = new MenuItem("Ban");
         // Add event: click on open item
         openItem.setOnAction((event) -> {
-            openDetails(clientName);
+            openDetails(inet.getHostName());
         });
         // Add event: click on disconnect item
         disconnectItem.setOnAction((event) -> {
-            // TODO: disconnect client
-            removeClientPane(clientName);
-            removeClientDetailsStage(clientName);
+            server.disconnectClient(inet);
         });
-
-        contextMenu.getItems().addAll(openItem,disconnectItem);
+        // Add event: click on ban item
+        banItem.setOnAction((event) -> {
+            server.addToBlackList(dataAccess.getMAC(inet.getHostName()));
+            server.disconnectClient(inet);
+        });
+        contextMenu.getItems().addAll(openItem, disconnectItem, banItem);
 
         // Add event: double-click on a TitledPane
         newTitledPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -157,7 +167,7 @@ public class overviewController {
             public void handle(MouseEvent mouseEvent) {
                 if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
                     if (mouseEvent.getClickCount() == 2) {
-                        openDetails(clientName);
+                        openDetails(inet.getHostName());
                     }
                 }
             }
@@ -169,12 +179,12 @@ public class overviewController {
         // Set the position for the new TitledPane
         // Calculate the position based on the number of existing panes.
         double xc, yc;
-        if ((clients.size() - 1) % 2 == 0) {
+        if (clientPanes.size() % 2 == 0) {
             xc = 14;
-            yc = 14 + (180 + gap) * (clients.size() - 1) / 2;
+            yc = 14 + (180 + gap) * (clientPanes.size()) / 2;
         } else {
             xc = 14 + (200 + gap);
-            yc = 14 + (180 + gap) * (int) ((clients.size() - 1) / 2);
+            yc = 14 + (180 + gap) * (int) ((clientPanes.size()) / 2);
         }
 
         newTitledPane.setLayoutX(xc);
@@ -192,7 +202,7 @@ public class overviewController {
         Stage stage = new Stage();
         try {
             Parent parent = fxmlLoader.load();
-            detailsController dc = fxmlLoader.getController();
+            DetailsController dc = fxmlLoader.getController();
             dc.setDL(clientName, dataAccess);
             dc.start();
 
@@ -234,16 +244,30 @@ public class overviewController {
                 Text ipText = (Text) container.getChildren().get(9);
                 Text macText = (Text) container.getChildren().get(10);
                 Text osText = (Text) container.getChildren().get(11);
+                Text statusText = (Text) container.getChildren().get(12);
                 ipText.setText(dataAccess.getIP(clientName));
                 macText.setText(dataAccess.getMAC(clientName));
                 osText.setText(dataAccess.getOSName(clientName));
+                if (dataAccess.getStatus(clientName) != null) {
+                    if (dataAccess.getStatus(clientName)) {
+                        statusText.setStyle("-fx-fill: #006400; -fx-font-weight: bold");
+                        statusText.setText("SAFE");
+                    } else {
+                        statusText.setStyle("-fx-fill: #af0505; -fx-font-weight: bold");
+                        statusText.setText("UNSAFE");
+                    }
+                } else {
+                    statusText.setStyle("-fx-fill: #ffdb00; -fx-font-weight: italic");
+                    statusText.setText("UNKNOWN");
+                }
+
             }
         }
     }
 
     // A client is disconnected from server
     public void removeClient(InetAddress address) {
-        this.clients.remove(address);
+//        this.clients.remove(address);
         removeClientPane(address.getHostName());
         removeClientDetailsStage(address.getHostName());
     }

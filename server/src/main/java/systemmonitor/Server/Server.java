@@ -2,10 +2,12 @@ package systemmonitor.Server;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Properties;
 
 import javafx.application.Platform;
-import systemmonitor.Controllers.overviewController;
+import systemmonitor.Controllers.OverviewController;
 
 // import utils.ClientHandler;
 
@@ -14,10 +16,14 @@ public class Server extends Thread {
     private int PORT;
     private int BACK_LOG;
 
-    private overviewController overview;
+    private HashSet<ClientHandler> clients = new HashSet<ClientHandler>();
+    private HashSet<String> blacklist = new HashSet<String>();
+
+    private OverviewController overview;
 
     public Server() {
         LoadServerConfig("src\\main\\resources\\config\\config.cfg");
+        LoadBannedList("src\\main\\resources\\config\\blacklist.txt");
     }
 
     private void LoadServerConfig(String fileConfig) {
@@ -28,14 +34,75 @@ public class Server extends Thread {
             this.HOSTNAME = config.getProperty("HOSTNAME");
             this.PORT = Integer.parseInt(config.getProperty("PORT"));
             this.BACK_LOG = Integer.parseInt(config.getProperty("BACK_LOG"));
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void setController(overviewController overview) {
+    private void LoadBannedList(String fileBlacklist) {
+        try (BufferedReader br = new BufferedReader(new FileReader(fileBlacklist))) {
+            String line;
+            // Read each line from the file
+            while ((line = br.readLine()) != null) {
+                blacklist.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setController(OverviewController overview) {
         this.overview = overview;
+        overview.setServer(this);
+    }
+
+    public void addClient(ClientHandler client) {
+        clients.add(client);
+        Platform.runLater(() -> {
+            // Ensure that overview is not null before calling the method
+            if (overview != null) {
+                overview.addClient(client.getInetAddress());
+            }
+        });
+    }
+
+    public void disconnectClient(InetAddress inet) {
+        for (ClientHandler client : clients) {
+            if (client.getInetAddress().equals(inet)) {
+                client.sendDisconnectMessage("disconnected");
+                client.disconnect();
+                break;
+            }
+        }
+    }
+
+    public void removeClient(ClientHandler client) {
+        clients.remove(client);
+        Platform.runLater(() -> {
+            // Ensure that overview is not null before calling the method
+            if (overview != null) {
+                overview.removeClient(client.getInetAddress());
+            }
+        });
+    }
+
+    public HashSet<ClientHandler> getClient() {
+        return clients;
+    }
+
+    public void addToBlackList(String macAddress) {
+        blacklist.add(macAddress);
+        try {
+            FileWriter fw = new FileWriter("src\\main\\resources\\config\\blacklist.txt", true);
+            fw.write(macAddress + "\n");
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public HashSet<String> getBlackList() {
+        return blacklist;
     }
 
     @Override
@@ -57,19 +124,12 @@ public class Server extends Thread {
             while (!serverSocket.isClosed()) {
                 try {
                     Socket clientSocket = serverSocket.accept();
-                    // System.out.println("Client connected: " +
-                    // clientSocket.getInetAddress().getHostName());
+
                     System.out.println("Client connected: ");
 
-                    Platform.runLater(() -> {
-                        // Ensure that overview is not null before calling the method
-                        if (overview != null) {
-                            overview.addClient(clientSocket.getInetAddress());
-                        }
-                    });
                     // Create a thread to handle the client's request
-                    ClientHandler clientHandler = new ClientHandler(clientSocket);
-                    clientHandler.setController(overview);
+                    ClientHandler clientHandler = new ClientHandler(clientSocket, this);
+//                    clientHandler.setController(overview);
                     clientHandler.start();
                 } catch (Exception e) {
                     e.printStackTrace();

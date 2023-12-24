@@ -5,10 +5,12 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import utils.Sender;
-import utils.SystemInfo;
+import utils.MessageReader;
+import utils.classes.SystemInfo;
 import utils.classes.DiskInfo;
 import utils.classes.ProcessInfo;
+
+import static java.lang.System.exit;
 
 class GetMAC {
     public static String GetMACAddress(InetAddress ip) {
@@ -29,6 +31,7 @@ class GetMAC {
 }
 
 public class Client {
+    Socket clientSocket;
     private String HOSTNAME;
     private int PORT;
 
@@ -63,7 +66,7 @@ public class Client {
                 processes.add(new ProcessInfo(line));
             }
             input.close();
-            
+
             return processes;
         } catch (Exception e) {
             e.printStackTrace();
@@ -74,20 +77,22 @@ public class Client {
     private byte[] ArrayList2Byte(ArrayList<ProcessInfo> ps) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);
-        ArrayList <String> result = ProcessInfo.convert2ArrayListString(ps);
+        ArrayList<String> result = ProcessInfo.convert2ArrayListString(ps);
         oos.writeObject(result);
         byte[] bytes = bos.toByteArray();
         return bytes;
     }
 
     private void Run() throws IOException {
+
         SystemInfo s = new SystemInfo();
-        Socket clientSocket = null;
         try {
             clientSocket = new Socket(this.HOSTNAME, this.PORT);
             DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
             DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
 
+            MessageReader messageReader = new MessageReader(clientSocket, this);
+            messageReader.start();
             // MAC
             String IP = dis.readUTF();
             String MAC = GetMAC.GetMACAddress(InetAddress.getByName(IP));
@@ -103,6 +108,13 @@ public class Client {
 
             while (clientSocket.isConnected()) {
                 ArrayList<ProcessInfo> processes = getAllProcesses("src\\main\\resources\\lib\\getProcessProperties.exe");
+                processes.sort((o1, o2) -> {
+                    if (o1.getProcessName().compareTo(o2.getProcessName()) == 0) {
+                        return o1.getPID().compareTo(o2.getPID());
+                    } else {
+                        return o1.getProcessName().compareTo(o2.getProcessName());
+                    }
+                });
                 // CPU and Mem Load
                 dos.writeDouble(s.getCpuLoad());
                 dos.writeLong(s.getMemUsage());
@@ -134,16 +146,27 @@ public class Client {
                 dos.write(bytes);
                 dos.flush();
 
-                
+
                 dos.writeBoolean(isWarning);
 
                 Thread.sleep(DELAY_SEND);
             }
-        } catch (IOException e) {
+
+        } catch (SocketException e) {
+            System.err.println("==============");
+            System.err.println(e.getMessage());
+            System.err.println("Connection reset. Reconnecting...");
             try {
-                System.err.println("==============");
-                 System.err.println(e.getMessage());
-                System.err.println("Connection Time out. Reconnecting...");
+                Thread.sleep(TIMEOUT);
+                this.Run();
+            } catch (InterruptedException e1) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            System.err.println("==============");
+            System.err.println(e.getMessage());
+            System.err.println("Cannot send data to server. Reconnecting...");
+            try {
                 Thread.sleep(TIMEOUT);
                 this.Run();
             } catch (InterruptedException e1) {
@@ -160,6 +183,19 @@ public class Client {
                 }
             }
         }
+    }
+
+    public void stop() {
+        if (!clientSocket.isClosed()) {
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                System.err.println("Cannot close socket!");
+//                e.printStackTrace();
+            }
+        }
+
+        exit(0);
     }
 
     public static void main(String[] args) throws IOException {
