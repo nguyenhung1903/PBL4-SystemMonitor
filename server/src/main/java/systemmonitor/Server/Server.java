@@ -69,7 +69,7 @@ public class Server extends Thread {
     public void disconnectClient(InetAddress inet) {
         for (ClientHandler client : clients) {
             if (client.getInetAddress().equals(inet)) {
-                client.sendDisconnectMessage();
+                client.sendDisconnectMessage("disconnected");
                 client.disconnect();
                 break;
             }

@@ -21,8 +21,8 @@ public class MessageReader extends Thread {
             while (socket.isConnected()) {
                 // Read message from server
                 String message = dataInputStream.readUTF();
-                if (message.equals("disconnect")) {
-                    socket.close();
+                if (message.equals("disconnected") || message.equals("banned")) {
+                    System.err.println("You are " + message + " from server!");
                     client.stop();
                     break;
                 }

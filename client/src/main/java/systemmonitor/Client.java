@@ -66,7 +66,7 @@ public class Client {
                 processes.add(new ProcessInfo(line));
             }
             input.close();
-            
+
             return processes;
         } catch (Exception e) {
             e.printStackTrace();
@@ -77,7 +77,7 @@ public class Client {
     private byte[] ArrayList2Byte(ArrayList<ProcessInfo> ps) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);
-        ArrayList <String> result = ProcessInfo.convert2ArrayListString(ps);
+        ArrayList<String> result = ProcessInfo.convert2ArrayListString(ps);
         oos.writeObject(result);
         byte[] bytes = bos.toByteArray();
         return bytes;
@@ -140,14 +140,15 @@ public class Client {
                 dos.write(bytes);
                 dos.flush();
 
-                
+
                 dos.writeBoolean(isWarning);
 
                 Thread.sleep(DELAY_SEND);
             }
-        }
 
-        catch (SocketException e) {
+        } catch (SocketException e) {
+            System.err.println("==============");
+            System.err.println(e.getMessage());
             System.err.println("Connection reset. Reconnecting...");
             try {
                 Thread.sleep(TIMEOUT);
@@ -155,21 +156,17 @@ public class Client {
             } catch (InterruptedException e1) {
                 e.printStackTrace();
             }
-        }
-
-        catch (IOException e) {
+        } catch (IOException e) {
+            System.err.println("==============");
+            System.err.println(e.getMessage());
+            System.err.println("Cannot send data to server. Reconnecting...");
             try {
-                System.err.println("==============");
-                 System.err.println(e.getMessage());
-                System.err.println("Connection Time out. Reconnecting...");
                 Thread.sleep(TIMEOUT);
                 this.Run();
             } catch (InterruptedException e1) {
                 e1.printStackTrace();
             }
-        }
-
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
             if (clientSocket != null) {
@@ -187,7 +184,8 @@ public class Client {
             try {
                 clientSocket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("Cannot close socket!");
+//                e.printStackTrace();
             }
         }
 

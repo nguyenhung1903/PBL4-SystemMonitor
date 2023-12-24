@@ -127,6 +127,7 @@ public class ClientHandler extends Thread {
 
         if (server.getBlackList().contains(MAC)) {
             System.out.println("Client " + clientSocket.getInetAddress().getHostName() + " is in blacklist!");
+            sendDisconnectMessage("banned");
             disconnect();
             return;
         } else {
@@ -288,10 +289,10 @@ public class ClientHandler extends Thread {
         }
     }
 
-    public void sendDisconnectMessage() {
+    public void sendDisconnectMessage(String message) {
         try {
             DataOutputStream dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
-            dataOutputStream.writeUTF("disconnect");
+            dataOutputStream.writeUTF(message);
         } catch (IOException e) {
             System.err.println("Cannot send disconnect message to client!");
             e.printStackTrace();
