@@ -288,6 +288,16 @@ public class ClientHandler extends Thread {
         }
     }
 
+    public void sendDisconnectMessage() {
+        try {
+            DataOutputStream dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
+            dataOutputStream.writeUTF("disconnect");
+        } catch (IOException e) {
+            System.err.println("Cannot send disconnect message to client!");
+            e.printStackTrace();
+        }
+    }
+
     private void writeTextfile(String filePath, DataInputStream dataInputStream) {
         try {
             InputStreamReader in = new InputStreamReader(dataInputStream);

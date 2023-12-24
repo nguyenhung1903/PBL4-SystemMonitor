@@ -5,10 +5,12 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import utils.Sender;
-import utils.SystemInfo;
+import utils.MessageReader;
+import utils.classes.SystemInfo;
 import utils.classes.DiskInfo;
 import utils.classes.ProcessInfo;
+
+import static java.lang.System.exit;
 
 class GetMAC {
     public static String GetMACAddress(InetAddress ip) {
@@ -29,6 +31,7 @@ class GetMAC {
 }
 
 public class Client {
+    Socket clientSocket;
     private String HOSTNAME;
     private int PORT;
 
@@ -81,13 +84,16 @@ public class Client {
     }
 
     private void Run() throws IOException {
+
+
         SystemInfo s = new SystemInfo();
-        Socket clientSocket = null;
         try {
             clientSocket = new Socket(this.HOSTNAME, this.PORT);
             DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
             DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
 
+            MessageReader messageReader = new MessageReader(clientSocket, this);
+            messageReader.start();
             // MAC
             String IP = dis.readUTF();
             String MAC = GetMAC.GetMACAddress(InetAddress.getByName(IP));
@@ -174,6 +180,18 @@ public class Client {
                 }
             }
         }
+    }
+
+    public void stop() {
+        if (!clientSocket.isClosed()) {
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        exit(0);
     }
 
     public static void main(String[] args) throws IOException {
