@@ -15,6 +15,7 @@ public class Server extends Thread {
     private String HOSTNAME;
     private int PORT;
     private int BACK_LOG;
+    private ServerSocket serverSocket;
 
     private HashSet<ClientHandler> clients = new HashSet<ClientHandler>();
     private HashSet<String> blacklist = new HashSet<String>();
@@ -108,7 +109,7 @@ public class Server extends Thread {
     @Override
     public void run() {
         InetAddress address = null;
-        ServerSocket serverSocket = null;
+        serverSocket = null;
 
         try {
             address = InetAddress.getByName(this.HOSTNAME);
@@ -129,29 +130,33 @@ public class Server extends Thread {
 
                     // Create a thread to handle the client's request
                     ClientHandler clientHandler = new ClientHandler(clientSocket, this);
-//                    clientHandler.setController(overview);
                     clientHandler.start();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    // TODO: Catch exception
+                } catch (SocketException e) {
+                    System.err.println("Cannot accept client!");
+//                    e.printStackTrace();
                 }
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            // TODO: Catch exception
-        } finally {
-            if (serverSocket != null) {
-                try {
-                    serverSocket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    // TODO: Catch exception
-                }
-            }
+        } catch (IOException e) {
+            System.err.println("Cannot start server!");
+//            e.printStackTrace();
         }
     }
 
+    public void stopServer() {
+        for (ClientHandler client : clients) {
+            client.disconnect();
+        }
+
+        if (!serverSocket.isClosed()) {
+            try {
+                this.interrupt();
+                serverSocket.close();
+            } catch (IOException e) {
+                System.err.println("Cannot close socket!");
+            }
+        }
+    }
     // public static void main(String[] args) throws IOException {
     // Server app = new Server();
     // app.LoadServerConfig("src\\main\\resources\\config\\config.cfg");
