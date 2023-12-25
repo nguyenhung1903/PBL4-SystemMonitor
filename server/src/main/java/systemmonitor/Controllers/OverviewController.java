@@ -1,7 +1,6 @@
 package systemmonitor.Controllers;
 
 import java.net.InetAddress;
-import java.util.ArrayList;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -21,11 +20,11 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import systemmonitor.App;
-import systemmonitor.Server.ClientHandler;
 import systemmonitor.Server.Server;
 import systemmonitor.Utilities.DataAccess;
 
 public class OverviewController {
+
     private Server server;
     // List of Client's InetAddresses
 //    private ArrayList<InetAddress> clients;
@@ -37,14 +36,18 @@ public class OverviewController {
     // timestep to reload information of client
     private double timestep = 1;
     // Redis connector
-    private DataAccess dataAccess;
+    private final DataAccess dataAccess;
 
     @FXML
     private ScrollPane scrollPane;
     @FXML
     private AnchorPane anchorScrollPane;
+    @FXML
+    public Button restartBtn;
+    @FXML
+    public Button stopBtn;
 
-    private double gap = 50; // distance between two client's panes
+    private final double gap = 50; // distance between two client's panes
 
     // Constructor
     public OverviewController() {
@@ -53,6 +56,8 @@ public class OverviewController {
     }
 
     public void initialize() {
+        AttachButtonEvents();
+
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(timestep),
                 event -> updateClientPane()));
         timeline.setCycleCount(Timeline.INDEFINITE);
@@ -221,6 +226,42 @@ public class OverviewController {
         }
     }
 
+    private void AttachButtonEvents() {
+        // Attach event for restart button
+        restartBtn.setOnAction((event) -> {
+            if (server.getState() == Thread.State.TERMINATED) {
+                server = new Server();
+                server.setController(this);
+                server.start();
+                if (stopBtn.isDisable())
+                    stopBtn.setDisable(false);
+            } else {
+                server.stopServer();
+                try {
+                    server.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                server = new Server();
+                server.setController(this);
+                server.start();
+            }
+        });
+
+        // Attach event for stop button
+        stopBtn.setOnAction((event) -> {
+            if (!server.isInterrupted()) {
+                server.stopServer();
+                try {
+                    server.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                stopBtn.setDisable(true);
+            }
+        });
+    }
+
     // Update panes (client's information) after a step of time
     private void updateClientPane() {
         if (clientPanes.isEmpty())
@@ -311,5 +352,4 @@ public class OverviewController {
             }
         }
     }
-
 }
