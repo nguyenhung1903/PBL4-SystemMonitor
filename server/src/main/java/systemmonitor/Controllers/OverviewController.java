@@ -1,5 +1,6 @@
 package systemmonitor.Controllers;
 
+import java.awt.*;
 import java.net.InetAddress;
 
 import javafx.animation.KeyFrame;
@@ -12,6 +13,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -22,6 +27,7 @@ import javafx.util.Duration;
 import systemmonitor.App;
 import systemmonitor.Server.Server;
 import systemmonitor.Utilities.DataAccess;
+import systemmonitor.Utilities.TrayNotification;
 
 public class OverviewController {
 
@@ -294,6 +300,12 @@ public class OverviewController {
                         statusText.setStyle("-fx-fill: #006400; -fx-font-weight: bold");
                         statusText.setText("SAFE");
                     } else {
+                        try {
+                            TrayNotification.displayTray(clientName + ": Warning", clientName + " is in danger!");
+                        } catch (AWTException awtException){
+                            awtException.printStackTrace();
+                        }
+
                         statusText.setStyle("-fx-fill: #af0505; -fx-font-weight: bold");
                         statusText.setText("UNSAFE");
                     }
