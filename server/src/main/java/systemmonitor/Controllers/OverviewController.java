@@ -300,12 +300,7 @@ public class OverviewController {
                         statusText.setStyle("-fx-fill: #006400; -fx-font-weight: bold");
                         statusText.setText("SAFE");
                     } else {
-                        try {
-                            TrayNotification.displayTray(clientName + ": Warning", clientName + " is in danger!");
-                        } catch (AWTException awtException){
-                            awtException.printStackTrace();
-                        }
-
+                        TrayNotification.displayTray(clientName + ": Warning", clientName + " is in danger!", TrayNotification.WARNING);
                         statusText.setStyle("-fx-fill: #af0505; -fx-font-weight: bold");
                         statusText.setText("UNSAFE");
                     }

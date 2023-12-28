@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import javafx.application.Platform;
 import systemmonitor.Controllers.OverviewController;
+import systemmonitor.Utilities.TrayNotification;
 
 // import utils.ClientHandler;
 
@@ -127,6 +128,8 @@ public class Server extends Thread {
                     Socket clientSocket = serverSocket.accept();
 
                     System.out.println("Client connected: ");
+
+                    TrayNotification.displayTray("New client connected", "Client connected: " + clientSocket.getInetAddress(), TrayNotification.INFO);
 
                     // Create a thread to handle the client's request
                     ClientHandler clientHandler = new ClientHandler(clientSocket, this);

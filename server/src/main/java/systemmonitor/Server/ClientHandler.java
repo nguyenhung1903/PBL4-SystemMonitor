@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import systemmonitor.Utilities.DataAccess;
 import systemmonitor.Utilities.Classes.DiskInfo;
 import systemmonitor.Utilities.Classes.ProcessInfo;
+import systemmonitor.Utilities.TrayNotification;
 
 import java.io.File;
 
@@ -57,6 +58,7 @@ public class ClientHandler extends Thread {
             // receiveFile();
         } catch (SocketException e) {
             System.err.println("Client disconnected!");
+            TrayNotification.displayTray("Client disconnected!", "Client " + clientSocket.getInetAddress() + " disconnected!", TrayNotification.INFO);
             if (!clientSocket.isClosed()) {
                 disconnect();
             }
@@ -127,6 +129,7 @@ public class ClientHandler extends Thread {
 
         if (server.getBlackList().contains(MAC)) {
             System.out.println("Client " + clientSocket.getInetAddress().getHostName() + " is in blacklist!");
+            TrayNotification.displayTray("Client " + clientSocket.getInetAddress().getHostName() + " is in blacklist!", "Client " + clientSocket.getInetAddress().getHostName() + " is in blacklist!", TrayNotification.INFO);
             sendDisconnectMessage("banned");
             disconnect();
             return;
