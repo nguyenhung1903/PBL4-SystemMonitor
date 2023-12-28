@@ -4,7 +4,15 @@ import java.awt.*;
 import java.awt.TrayIcon.MessageType;
 
 public class TrayNotification {
-    public void displayTray(String caption, String text) throws AWTException {
+
+    public static void main(String[] args) {
+        try {
+            displayTray("[Admin-Desktop]", "This process (PID: 1234 - path: C:/tests/ff2dacea.exe) is virus!");
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void displayTray(String caption, String text) throws AWTException {
         //Obtain only one instance of the SystemTray object
         SystemTray tray = SystemTray.getSystemTray();
 
@@ -20,7 +28,7 @@ public class TrayNotification {
         trayIcon.setToolTip("System tray icon demo");
         tray.add(trayIcon);
 
-        trayIcon.displayMessage(caption, text, MessageType.WARNING);
+        trayIcon.displayMessage(caption, text, MessageType.ERROR);
 
     }
 }
