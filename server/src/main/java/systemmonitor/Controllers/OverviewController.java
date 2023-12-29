@@ -2,6 +2,8 @@ package systemmonitor.Controllers;
 
 import java.awt.*;
 import java.net.InetAddress;
+import java.util.HashSet;
+import java.util.Set;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -17,6 +19,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -32,6 +35,8 @@ import systemmonitor.Utilities.TrayNotification;
 public class OverviewController {
 
     private Server server;
+
+    private HashSet<String> clients = new HashSet<String>();
     // List of Client's InetAddresses
 //    private ArrayList<InetAddress> clients;
     // List of client's panes (client's pane is a titled pane)
@@ -55,6 +60,7 @@ public class OverviewController {
 
     private final double gap = 50; // distance between two client's panes
 
+    private final TrayNotification tray = new TrayNotification();
     // Constructor
     public OverviewController() {
 //        this.clients = new ArrayList<>();
@@ -218,6 +224,7 @@ public class OverviewController {
             dc.start();
 
             stage.setScene(new Scene(parent));
+            stage.getIcons().add(new Image("file:src/main/resources/assets/imgs/client.png"));
             stage.setTitle(clientName);
             stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                 @Override
@@ -236,7 +243,7 @@ public class OverviewController {
         // Attach event for restart button
         restartBtn.setOnAction((event) -> {
             if (server.getState() == Thread.State.TERMINATED) {
-                server = new Server();
+                server = new Server(new TrayNotification());
                 server.setController(this);
                 server.start();
                 if (stopBtn.isDisable())
@@ -248,7 +255,7 @@ public class OverviewController {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                server = new Server();
+                server = new Server(new TrayNotification());
                 server.setController(this);
                 server.start();
             }
@@ -300,7 +307,10 @@ public class OverviewController {
                         statusText.setStyle("-fx-fill: #006400; -fx-font-weight: bold");
                         statusText.setText("SAFE");
                     } else {
-                        TrayNotification.displayTray(clientName + ": Warning", clientName + " is in danger!", TrayNotification.WARNING);
+                        if (!clients.contains(clientName)) {
+                            tray.displayTray(clientName + ": Warning", clientName + " is in danger!", TrayNotification.WARNING);
+                            clients.add(clientName);
+                        }
                         statusText.setStyle("-fx-fill: #af0505; -fx-font-weight: bold");
                         statusText.setText("UNSAFE");
                     }

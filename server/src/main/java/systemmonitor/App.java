@@ -11,12 +11,15 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import systemmonitor.Controllers.OverviewController;
 import systemmonitor.Server.Server;
+import systemmonitor.Utilities.TrayNotification;
+
 import java.io.IOException;
 
 /**
  * JavaFX App
  */
 public class App extends Application {
+    private static final TrayNotification tray = new TrayNotification();
 
     private static Scene scene;
 
@@ -24,7 +27,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         // Start server to communicate with clients
-        Server server = new Server();
+        Server server = new Server(tray);
         // app.LoadServerConfig("src\\main\\resources\\config\\config.cfg");
 
         // set UI
@@ -32,6 +35,7 @@ public class App extends Application {
         scene = new Scene((Parent) fxmlLoader.load(), 525, 520);
         stage.setScene(scene);
         stage.setTitle("System Monitor");
+        stage.getIcons().add(new Image("file:src/main/resources/assets/imgs/icon.png"));
         OverviewController overviewController = fxmlLoader.getController();
         server.setController(overviewController);
         server.start();

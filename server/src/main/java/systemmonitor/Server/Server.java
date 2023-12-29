@@ -23,7 +23,10 @@ public class Server extends Thread {
 
     private OverviewController overview;
 
-    public Server() {
+    private TrayNotification tray;
+
+    public Server(TrayNotification tray) {
+        this.tray = tray;
         LoadServerConfig("src\\main\\resources\\config\\config.cfg");
         LoadBannedList("src\\main\\resources\\config\\blacklist.txt");
     }
@@ -129,7 +132,7 @@ public class Server extends Thread {
 
                     System.out.println("Client connected: ");
 
-                    TrayNotification.displayTray("New client connected", "Client connected: " + clientSocket.getInetAddress(), TrayNotification.INFO);
+                    tray.displayTray("New client connected", "Client connected: " + clientSocket.getInetAddress(), TrayNotification.INFO);
 
                     // Create a thread to handle the client's request
                     ClientHandler clientHandler = new ClientHandler(clientSocket, this);
