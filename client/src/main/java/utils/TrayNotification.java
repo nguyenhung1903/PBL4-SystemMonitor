@@ -3,32 +3,43 @@ package utils;
 import java.awt.*;
 import java.awt.TrayIcon.MessageType;
 
+
 public class TrayNotification {
+    public static MessageType ERROR = MessageType.ERROR;
+    public static MessageType WARNING = MessageType.WARNING;
+    public static MessageType INFO = MessageType.INFO;
+    public static MessageType NONE = MessageType.NONE;
 
+    //Obtain only one instance of the SystemTray object
+    SystemTray tray = SystemTray.getSystemTray();
+
+    TrayIcon trayIcon;
+
+    public static Integer time = 3000;
     public static void main(String[] args) {
-        try {
-            displayTray("[Admin-Desktop]", "This process (PID: 1234 - path: C:/tests/ff2dacea.exe) is virus!");
-        } catch (AWTException e) {
-            e.printStackTrace();
-        }
+        new TrayNotification().displayTray("Hello, World", "notification demo", MessageType.INFO);
     }
-    public static void displayTray(String caption, String text) throws AWTException {
-        //Obtain only one instance of the SystemTray object
-        SystemTray tray = SystemTray.getSystemTray();
 
+    public TrayNotification(){
         //If the icon is a file
-        Image image = Toolkit.getDefaultToolkit().createImage("icon.png");
+        Image image = Toolkit.getDefaultToolkit().createImage("src/main/resources/assets/imgs/icon.png");
         //Alternative (if the icon is on the classpath):
         //Image image = Toolkit.getDefaultToolkit().createImage(getClass().getResource("icon.png"));
 
-        TrayIcon trayIcon = new TrayIcon(image, "Tray Demo");
+        trayIcon = new TrayIcon(image, "Tray Demo");
+
         //Let the system resize the image if needed
         trayIcon.setImageAutoSize(true);
         //Set tooltip text for the tray icon
-        trayIcon.setToolTip("System tray icon demo");
-        tray.add(trayIcon);
+        trayIcon.setToolTip("System Monitor");
+        try {
+            tray.add(trayIcon);
+        } catch (AWTException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-        trayIcon.displayMessage(caption, text, MessageType.ERROR);
-
+    public void displayTray(String caption, String text, MessageType msgType) {
+        trayIcon.displayMessage(caption, text, msgType);
     }
 }
