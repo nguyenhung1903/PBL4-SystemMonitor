@@ -32,6 +32,7 @@ public class App extends Application {
         scene = new Scene((Parent) fxmlLoader.load(), 525, 520);
         stage.setScene(scene);
         stage.setTitle("System Monitor");
+        stage.getIcons().add(new Image("file:src/main/resources/image/server_icon.png"));
         OverviewController overviewController = fxmlLoader.getController();
         server.setController(overviewController);
         server.start();

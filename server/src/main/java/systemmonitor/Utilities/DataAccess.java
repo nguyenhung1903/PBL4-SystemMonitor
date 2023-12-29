@@ -6,11 +6,6 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import systemmonitor.Utilities.Classes.ProcessInfo;
 
-class Status{
-    public static boolean Warning = true;
-    public static boolean Normal = false;
-}
-
 public class DataAccess {
     // private String key;
 
