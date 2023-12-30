@@ -243,7 +243,7 @@ public class OverviewController {
         // Attach event for restart button
         restartBtn.setOnAction((event) -> {
             if (server.getState() == Thread.State.TERMINATED) {
-                server = new Server(new TrayNotification());
+                server = new Server(tray);
                 server.setController(this);
                 server.start();
                 if (stopBtn.isDisable())
@@ -255,7 +255,7 @@ public class OverviewController {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                server = new Server(new TrayNotification());
+                server = new Server(tray);
                 server.setController(this);
                 server.start();
             }
@@ -306,6 +306,8 @@ public class OverviewController {
                     if (dataAccess.getStatus(clientName)) {
                         statusText.setStyle("-fx-fill: #006400; -fx-font-weight: bold");
                         statusText.setText("SAFE");
+                        if (clients.contains(clientName)) { clients.remove(clientName); }
+
                     } else {
                         if (!clients.contains(clientName)) {
                             tray.displayTray(clientName + ": Warning", clientName + " is in danger!", TrayNotification.WARNING);
