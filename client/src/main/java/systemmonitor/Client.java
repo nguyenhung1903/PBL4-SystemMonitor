@@ -35,13 +35,17 @@ public class Client {
     Socket clientSocket;
     private String HOSTNAME;
     private int PORT;
-
     private int TIMEOUT;
     private int DELAY_SEND;
+
+    private String MALWARE_SERVER;
+    private int MALWARE_PORT;
 
     private boolean isWarning = false;
 
     TrayNotification tray = new TrayNotification();
+
+    private ScanAV scanAV;
 
     private void LoadConfig(String fileConfig) {
         Properties config = new Properties();
@@ -52,6 +56,9 @@ public class Client {
             this.PORT = Integer.parseInt(config.getProperty("PORT"));
             this.TIMEOUT = Integer.parseInt(config.getProperty("TIMEOUT"));
             this.DELAY_SEND = Integer.parseInt(config.getProperty("DELAY_SEND"));
+
+            this.MALWARE_SERVER =  config.getProperty("MALWARE_SERVER");
+            this.MALWARE_PORT = Integer.parseInt(config.getProperty("MALWARE_PORT"));
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -88,6 +95,8 @@ public class Client {
 
     private void Run() throws IOException {
 
+        scanAV = new ScanAV(tray, this.MALWARE_SERVER, this.MALWARE_PORT);
+
         SystemInfo s = new SystemInfo();
         try {
             clientSocket = new Socket(this.HOSTNAME, this.PORT);
@@ -120,6 +129,8 @@ public class Client {
                         return o1.getProcessName().compareTo(o2.getProcessName());
                     }
                 });
+                scanAV.updateProcess(processes);
+                scanAV.scan();
                 // CPU and Mem Load
                 dos.writeDouble(s.getCpuLoad());
                 dos.writeLong(s.getMemUsage());
@@ -151,8 +162,7 @@ public class Client {
                 dos.write(bytes);
                 dos.flush();
 
-
-                dos.writeBoolean(isWarning);
+                dos.writeBoolean(scanAV.getStatus());
 
                 Thread.sleep(DELAY_SEND);
             }
