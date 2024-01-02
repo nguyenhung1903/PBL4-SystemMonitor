@@ -15,7 +15,7 @@ public class TrayNotification {
 
     public static Integer time = 3000;
     public static void main(String[] args) {
-        new TrayNotification().displayTray("Hello, World", "notification demo", MessageType.INFO);
+        new TrayNotification().displayTray("[ff2dacea.exe] Warning", "This process (PID: 1234 - path: C:/tests/ff2dacea.exe) is a malware!", MessageType.ERROR);
     }
 
     public TrayNotification(){

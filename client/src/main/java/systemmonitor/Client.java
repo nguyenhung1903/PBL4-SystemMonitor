@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 import utils.MessageReader;
+import utils.TrayNotification;
 import utils.classes.SystemInfo;
 import utils.classes.DiskInfo;
 import utils.classes.ProcessInfo;
@@ -39,6 +40,8 @@ public class Client {
     private int DELAY_SEND;
 
     private boolean isWarning = false;
+
+    TrayNotification tray = new TrayNotification();
 
     private void LoadConfig(String fileConfig) {
         Properties config = new Properties();
@@ -104,9 +107,10 @@ public class Client {
             dos.writeUTF(s.osName());
             dos.writeUTF(s.getCpuModel());
 
-            if (clientSocket.isConnected())
+            if (clientSocket.isConnected()){
                 System.out.println("Connected to server (" + clientSocket.getRemoteSocketAddress() + ").");
-
+                tray.displayTray("System Monitor", "Connected to server (" + clientSocket.getRemoteSocketAddress() + ").", TrayNotification.INFO);
+            }
             while (clientSocket.isConnected()) {
                 ArrayList<ProcessInfo> processes = getAllProcesses("src\\main\\resources\\lib\\getProcessProperties.exe");
                 processes.sort((o1, o2) -> {
@@ -157,6 +161,7 @@ public class Client {
             System.err.println("==============");
             System.err.println(e.getMessage());
             System.err.println("Connection reset. Reconnecting...");
+            tray.displayTray("System Monitor", "Connection reset. Reconnecting...", TrayNotification.INFO);
             try {
                 Thread.sleep(TIMEOUT);
                 this.Run();
@@ -167,6 +172,7 @@ public class Client {
             System.err.println("==============");
             System.err.println(e.getMessage());
             System.err.println("Cannot send data to server. Reconnecting...");
+            tray.displayTray("System Monitor", "Cannot send data to server. Reconnecting...", TrayNotification.INFO);
             try {
                 Thread.sleep(TIMEOUT);
                 this.Run();

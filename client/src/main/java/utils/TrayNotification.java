@@ -22,7 +22,7 @@ public class TrayNotification {
 
     public TrayNotification(){
         //If the icon is a file
-        Image image = Toolkit.getDefaultToolkit().createImage("src/main/resources/assets/imgs/icon.png");
+        Image image = Toolkit.getDefaultToolkit().createImage("src/main/resources/images/icon.png");
         //Alternative (if the icon is on the classpath):
         //Image image = Toolkit.getDefaultToolkit().createImage(getClass().getResource("icon.png"));
 

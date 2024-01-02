@@ -36,7 +36,7 @@ public class OverviewController {
 
     private Server server;
 
-    private HashSet<String> clients = new HashSet<String>();
+    private HashSet<String> clientnameHasNotiList = new HashSet<String>();
     // List of Client's InetAddresses
 //    private ArrayList<InetAddress> clients;
     // List of client's panes (client's pane is a titled pane)
@@ -243,6 +243,7 @@ public class OverviewController {
         // Attach event for restart button
         restartBtn.setOnAction((event) -> {
             if (server.getState() == Thread.State.TERMINATED) {
+                clientnameHasNotiList = new HashSet<>();
                 server = new Server(tray);
                 server.setController(this);
                 server.start();
@@ -306,12 +307,12 @@ public class OverviewController {
                     if (dataAccess.getStatus(clientName)) {
                         statusText.setStyle("-fx-fill: #006400; -fx-font-weight: bold");
                         statusText.setText("SAFE");
-                        if (clients.contains(clientName)) { clients.remove(clientName); }
+                        if (clientnameHasNotiList.contains(clientName)) { clientnameHasNotiList.remove(clientName); }
 
                     } else {
-                        if (!clients.contains(clientName)) {
+                        if (!clientnameHasNotiList.contains(clientName)) {
                             tray.displayTray(clientName + ": Warning", clientName + " is in danger!", TrayNotification.WARNING);
-                            clients.add(clientName);
+                            clientnameHasNotiList.add(clientName);
                         }
                         statusText.setStyle("-fx-fill: #af0505; -fx-font-weight: bold");
                         statusText.setText("UNSAFE");

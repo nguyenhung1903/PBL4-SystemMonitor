@@ -150,18 +150,19 @@ public class Server extends Thread {
     }
 
     public void stopServer() {
-        for (ClientHandler client : clients) {
+        for (ClientHandler client : (HashSet<ClientHandler>) this.clients.clone()) {
             client.disconnect();
         }
 
         if (!serverSocket.isClosed()) {
             try {
-                this.interrupt();
                 serverSocket.close();
+                this.interrupt();
             } catch (IOException e) {
                 System.err.println("Cannot close socket!");
             }
         }
+
     }
     // public static void main(String[] args) throws IOException {
     // Server app = new Server();
