@@ -2,9 +2,12 @@ package systemmonitor.Server;
 
 import java.io.*;
 import java.net.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Properties;
+import java.util.UUID;
 
 import javafx.application.Platform;
 import systemmonitor.Controllers.OverviewController;
@@ -16,6 +19,8 @@ public class Server extends Thread {
     private String HOSTNAME;
     private int PORT;
     private int BACK_LOG;
+
+    private File logFile;
     private ServerSocket serverSocket;
 
     private HashSet<ClientHandler> clients = new HashSet<ClientHandler>();
@@ -29,6 +34,7 @@ public class Server extends Thread {
         this.tray = tray;
         LoadServerConfig("src\\main\\resources\\config\\config.cfg");
         LoadBannedList("src\\main\\resources\\config\\blacklist.txt");
+        createLogFile();
     }
 
     private void LoadServerConfig(String fileConfig) {
@@ -51,6 +57,32 @@ public class Server extends Thread {
             while ((line = br.readLine()) != null) {
                 blacklist.add(line);
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createLogFile() {
+        logFile = new File("src\\main\\resources\\log\\server_log" + System.currentTimeMillis() + ".txt");
+        try {
+            logFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeLog(String message) {
+        try {
+            FileWriter fw = new FileWriter(logFile, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formatDateTime = now.format(formatter);
+            bw.write("[" + formatDateTime + "] " + message + "\n");
+
+            bw.close();
+            fw.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -125,6 +157,7 @@ public class Server extends Thread {
             serverSocket = new ServerSocket(this.PORT, this.BACK_LOG, address);
             serverSocket.setReuseAddress(true);
             System.out.println("Server started at " + this.HOSTNAME + ":" + this.PORT);
+            this.writeLog("Server started at " + this.HOSTNAME + ":" + this.PORT);
 
             while (!serverSocket.isClosed()) {
                 try {
@@ -133,12 +166,13 @@ public class Server extends Thread {
                     System.out.println("Client connected: ");
 
                     tray.displayTray("New client connected", "Client connected: " + clientSocket.getInetAddress(), TrayNotification.INFO);
-
+                    this.writeLog("Client connected: " + clientSocket.getInetAddress());
                     // Create a thread to handle the client's request
                     ClientHandler clientHandler = new ClientHandler(clientSocket, this);
                     clientHandler.start();
                 } catch (SocketException e) {
                     System.err.println("Cannot accept client!");
+                    this.writeLog("Cannot accept client!");
 //                    e.printStackTrace();
                 }
             }
