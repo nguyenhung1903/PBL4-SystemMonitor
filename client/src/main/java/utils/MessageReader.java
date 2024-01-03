@@ -44,7 +44,7 @@ public class MessageReader extends Thread {
                 String message = dataInputStream.readUTF();
                 if (message.equals("disconnected") || message.equals("banned")) {
                     System.err.println("You are " + message + " from server!");
-                    DisconnectInterface(GetMAC.GetMACAddress(socket.getInetAddress()), "disable");
+                    DisconnectInterface(client.getMAC(), "disable");
                     client.stop();
                     break;
                 }

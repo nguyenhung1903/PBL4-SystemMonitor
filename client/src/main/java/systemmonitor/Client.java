@@ -28,6 +28,8 @@ public class Client {
 
     private boolean isWarning = false;
 
+    private String MAC = "";
+
     TrayNotification tray = new TrayNotification();
 
     private ScanAV scanAV;
@@ -48,6 +50,10 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getMAC() {
+        return MAC;
     }
 
     private ArrayList<ProcessInfo> getAllProcesses(String command) {
@@ -90,7 +96,7 @@ public class Client {
 
             // MAC
             String IP = dis.readUTF();
-            String MAC = GetMAC.GetMACAddress(InetAddress.getByName(IP));
+            MAC = GetMAC.GetMACAddress(InetAddress.getByName(IP));
             dos.writeUTF(MAC);
             //
 
