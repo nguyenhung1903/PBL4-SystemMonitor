@@ -14,6 +14,7 @@ import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
 import systemmonitor.Utilities.DataAccess;
@@ -22,6 +23,7 @@ import systemmonitor.Utilities.Classes.ProcessInfo;
 import systemmonitor.Utilities.TrayNotification;
 
 import java.io.File;
+import java.util.concurrent.TimeoutException;
 
 public class ClientHandler extends Thread {
     private final Socket clientSocket;
@@ -34,8 +36,9 @@ public class ClientHandler extends Thread {
 
     DataAccess dataAccess;
 
-    public ClientHandler(Socket socket, Server server) {
+    public ClientHandler(Socket socket, Server server) throws SocketException {
         this.clientSocket = socket;
+        clientSocket.setSoTimeout(5000);
         this.server = server;
         this.dataAccess = new DataAccess();
     }
@@ -56,6 +59,12 @@ public class ClientHandler extends Thread {
             receiveDynamicInfo();
             // receiveObject();
             // receiveFile();
+        } catch (SocketTimeoutException e) {
+            System.err.println("Take too long for new information.");
+            new TrayNotification().displayTray("Client disconnected!", "Client " + clientSocket.getInetAddress() + " disconnected!", TrayNotification.INFO);
+            if (!clientSocket.isClosed()) {
+                disconnect();
+            }
         } catch (SocketException e) {
             System.err.println("Client disconnected!");
             new TrayNotification().displayTray("Client disconnected!", "Client " + clientSocket.getInetAddress() + " disconnected!", TrayNotification.INFO);
