@@ -69,6 +69,7 @@ public class ClientHandler extends Thread {
             System.err.println("Client disconnected!");
             new TrayNotification().displayTray("Client disconnected!", "Client " + clientSocket.getInetAddress() + " disconnected!", TrayNotification.INFO);
             if (!clientSocket.isClosed()) {
+                server.writeLog("Client " + clientSocket.getInetAddress() + ": " + e.getMessage());
                 disconnect();
             }
         } catch (IOException e) {

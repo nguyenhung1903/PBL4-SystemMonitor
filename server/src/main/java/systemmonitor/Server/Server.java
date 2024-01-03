@@ -71,7 +71,7 @@ public class Server extends Thread {
         }
     }
 
-    private void writeLog(String message) {
+    public void writeLog(String message) {
         try {
             FileWriter fw = new FileWriter(logFile, true);
             BufferedWriter bw = new BufferedWriter(fw);
@@ -115,6 +115,7 @@ public class Server extends Thread {
 
     public void removeClient(ClientHandler client) {
         clients.remove(client);
+        writeLog("Client disconnected: " + client.getInetAddress());
         Platform.runLater(() -> {
             // Ensure that overview is not null before calling the method
             if (overview != null) {
@@ -172,14 +173,12 @@ public class Server extends Thread {
                     clientHandler.start();
                 } catch (SocketException e) {
                     System.err.println("Cannot accept client!");
-                    this.writeLog("Cannot accept client!");
-//                    e.printStackTrace();
                 }
             }
 
         } catch (IOException e) {
             System.err.println("Cannot start server!");
-//            e.printStackTrace();
+            writeLog("Cannot start server.");
         }
     }
 
@@ -197,6 +196,7 @@ public class Server extends Thread {
             }
         }
 
+        writeLog("Server stopped.");
     }
     // public static void main(String[] args) throws IOException {
     // Server app = new Server();
