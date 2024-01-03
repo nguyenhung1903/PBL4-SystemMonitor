@@ -93,6 +93,7 @@ public class OverviewController {
 
         AnchorPane contentPane = new AnchorPane();
         contentPane.setPrefSize(220, 180);
+//        contentPane.setManaged(false);
 
         // Customize the content of the TitledPane
 
@@ -302,7 +303,13 @@ public class OverviewController {
                 Text statusText = (Text) container.getChildren().get(12);
                 ipText.setText(dataAccess.getIP(clientName));
                 macText.setText(dataAccess.getMAC(clientName));
-                osText.setText(dataAccess.getOSName(clientName));
+                String ostext = dataAccess.getOSName(clientName);
+                if (ostext.length() > 17) {
+                    osText.setText(ostext.substring(0,17) + "...");
+                } else {
+                    osText.setText(ostext);
+                }
+
                 if (dataAccess.getStatus(clientName) != null) {
                     if (dataAccess.getStatus(clientName)) {
                         statusText.setStyle("-fx-fill: #006400; -fx-font-weight: bold");
