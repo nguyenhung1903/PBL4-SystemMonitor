@@ -5,6 +5,7 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import utils.GetMAC;
 import utils.MessageReader;
 import utils.TrayNotification;
 import utils.classes.SystemInfo;
@@ -13,23 +14,7 @@ import utils.classes.ProcessInfo;
 
 import static java.lang.System.exit;
 
-class GetMAC {
-    public static String GetMACAddress(InetAddress ip) {
-        try {
-            NetworkInterface network = NetworkInterface.getByInetAddress(ip);
-            byte[] mac = network.getHardwareAddress();
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < mac.length; i++) {
-                builder.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
-            }
 
-            return builder.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-}
 
 public class Client {
     Socket clientSocket;
