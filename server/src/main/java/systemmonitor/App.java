@@ -42,6 +42,8 @@ public class App extends Application {
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent t) {
+                if (server.getState() == Thread.State.RUNNABLE)
+                    server.stopServer();
                 Platform.exit();
                 System.exit(0);
             }
