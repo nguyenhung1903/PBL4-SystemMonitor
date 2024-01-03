@@ -234,6 +234,7 @@ public class OverviewController {
                 }
             });
             openingStages.add(stage);
+            stage.setResizable(false);
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
